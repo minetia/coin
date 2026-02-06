@@ -1,0 +1,28 @@
+/* style.css 수정본 */
+header { 
+    position: fixed; 
+    top: 0; 
+    width: 100%; 
+    height: 140px; /* 로고와 검색창을 위해 높이를 충분히 확보 */
+    z-index: 2000; 
+    background: var(--card-bg); 
+    border-bottom: 1px solid var(--border-color); 
+    display: flex; 
+    flex-direction: column; /* 세로로 배치 */
+    justify-content: center; /* 세로 중앙 정렬 */
+    padding: 0 20px; 
+}
+
+.header-inner { 
+    width: 100%; 
+    max-width: 1200px; 
+    margin: 0 auto; 
+    display: flex; 
+    flex-direction: column; 
+    gap: 15px; /* 로고와 검색창 사이의 간격을 벌림 */
+}
+
+/* 메인 리스트가 헤더에 가려지지 않게 본문 시작 위치도 조정 */
+main { 
+    padding-top: 160px !important; /* 헤더 높이(140px)보다 조금 더 크게 설정 */
+}

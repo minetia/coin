@@ -1,0 +1,32 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+    <meta charset="UTF-8">
+    <title>InfoGram Crypto - Hub</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <link rel="stylesheet" href="style.css">
+    <script src="https://cdn.jsdelivr.net/npm/axios/dist/axios.min.js"></script>
+</head>
+<body>
+    <header>
+        <div style="font-weight:800; font-size:1.5rem;">InfoGram <span style="color:var(--accent);">CRYPTO</span></div>
+        <i class="fas fa-moon"></i>
+    </header>
+
+    <main style="padding: 80px 15px 100px;">
+        <input type="text" id="mainSearch" placeholder="코인 검색..." style="text-align:left;">
+        <div id="coinList"></div>
+    </main>
+
+    <nav class="bottom-nav">
+        <div class="nav-inner">
+            <a href="#" class="nav-item"><i class="fas fa-home"></i><span class="nav-text">홈</span></a>
+            <a href="index.html" class="nav-item active"><i class="fas fa-chart-line"></i><span class="nav-text">거래소</span></a>
+            <a href="#" class="nav-item"><i class="fas fa-briefcase"></i><span class="nav-text">비즈니스</span></a>
+            <a href="#" class="nav-item"><i class="fas fa-newspaper"></i><span class="nav-text">뉴스</span></a>
+            <a href="#" class="nav-item"><i class="fas fa-microchip"></i><span class="nav-text">기술분석</span></a>
+        </div>
+    </nav>
+    <script src="main.js"></script>
+</body>
+</html>

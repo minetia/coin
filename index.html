@@ -1,0 +1,148 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>InfoGram Crypto</title>
+    <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;500;700;800&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <script src="https://cdn.jsdelivr.net/npm/axios/dist/axios.min.js"></script>
+    
+    <style>
+        :root {
+            --bg-color: #0f172a; --card-bg: #1e293b; --text-main: #f1f5f9; 
+            --border-color: #334155; --accent: #f59e0b; --up-color: #ef4444; --down-color: #2563eb;
+        }
+        body { background-color: var(--bg-color) !important; color: var(--text-main); margin: 0; padding: 0; overflow-x: hidden; }
+
+        /* 최상단 전광판 */
+        .top-ticker { position: fixed; top: 0; left: 0; width: 100%; height: 30px; background: #000; z-index: 10001; display: flex; align-items: center; overflow: hidden; font-size: 0.75rem; border-bottom: 1px solid #222; }
+        .ticker-track { display: flex; animation: scroll 30s linear infinite; gap: 30px; white-space: nowrap; }
+        @keyframes scroll { from { transform: translateX(0); } to { transform: translateX(-50%); } }
+
+        /* 헤더 고정 */
+        header { position: fixed; top: 30px; left: 0; width: 100%; height: 90px; background: var(--card-bg); border-bottom: 1px solid var(--border-color); z-index: 10000; display: flex; flex-direction: column; justify-content: center; padding: 0 15px; }
+        .header-top { display: flex; justify-content: space-between; align-items: center; margin-bottom: 5px; }
+
+        /* 본문 간격 최적화 */
+        main { margin-top: 125px !important; padding: 0 10px 100px !important; max-width: 1200px; margin: 0 auto; }
+        .search-area input { width: 100%; padding: 10px; border-radius: 8px; border: 1px solid var(--border-color); background: #0a0f1d; color: #fff; font-size: 0.9rem; outline: none; }
+
+        /* 시장 전환 버튼 */
+        .tab-btn { flex: 1; padding: 10px; background: var(--card-bg); border: 1px solid var(--border-color); border-radius: 6px; color: #94a3b8; font-weight: 800; cursor: pointer; transition: 0.2s; }
+        .tab-btn.active { background: var(--accent) !important; color: #000 !important; border-color: var(--accent); }
+
+        /* 리스트 스타일 */
+        .coin-row { background: var(--card-bg); border-radius: 10px; padding: 12px; margin-bottom: 6px; border: 1px solid var(--border-color); display: flex; align-items: center; justify-content: space-between; text-decoration: none; color: inherit; }
+        
+        /* 하단바 */
+        .bottom-nav { position: fixed; bottom: 0; left: 0; width: 100%; height: 65px; background: var(--card-bg); border-top: 1px solid var(--border-color); display: flex; justify-content: space-around; align-items: center; z-index: 10000; }
+        .nav-item { text-decoration: none; color: #94a3b8; text-align: center; flex: 1; font-size: 0.6rem; }
+        .nav-item.active { color: var(--accent); }
+    </style>
+</head>
+<body class="dark-mode">
+
+    <div class="top-ticker"><div class="ticker-track" id="topTicker"><span>연결 중...</span></div></div>
+
+    <header>
+        <div class="header-top">
+            <div style="font-weight:800; font-size:1.3rem; cursor:pointer;" onclick="location.reload()">InfoGram <span style="color:var(--accent);">CRYPTO</span></div>
+            <i class="fas fa-moon" style="color:var(--accent); font-size:1.2rem;"></i>
+        </div>
+        <div class="search-area"><input type="text" id="mainSearch" placeholder="코인 검색..."></div>
+    </header>
+
+    <main>
+        <div style="display: flex; gap: 5px; margin-bottom: 10px;">
+            <button id="tabKrw" class="tab-btn active" onclick="switchMarket('DOMESTIC')">🇰🇷 국내</button>
+            <button id="tabUsdt" class="tab-btn" onclick="switchMarket('OVERSEAS')">🌏 해외</button>
+        </div>
+        <div id="coinList"><div style="text-align:center; padding:50px; color:var(--text-sub);">연결 중...</div></div>
+    </main>
+
+    <nav class="bottom-nav">
+        <a href="https://minetia.github.io/Home/" class="nav-item"><i class="fas fa-home"></i><br>홈</a>
+        <a href="index.html" class="nav-item active"><i class="fas fa-chart-line"></i><br>거래소</a>
+        <a href="https://minetia.github.io/Business/" class="nav-item"><i class="fas fa-briefcase"></i><br>비즈니스</a>
+        <a href="https://minetia.github.io/News/" class="nav-item"><i class="fas fa-newspaper"></i><br>뉴스</a>
+        <a href="https://minetia.github.io/tech/" class="nav-item"><i class="fas fa-microchip"></i><br>기술</a>
+    </nav>
+
+    <script>
+        let allCoins = [];
+        let currentMarket = 'DOMESTIC';
+        let isFetching = false; // 중복 호출 방지용
+
+        async function switchMarket(market) {
+            if (currentMarket === market) return;
+            currentMarket = market;
+            document.getElementById('tabKrw').classList.toggle('active', market === 'DOMESTIC');
+            document.getElementById('tabUsdt').classList.toggle('active', market === 'OVERSEAS');
+            document.getElementById('coinList').innerHTML = '<div style="text-align:center; padding:50px; color:var(--text-sub);">시장 전환 중...</div>';
+            allCoins = []; // 초기화
+            await fetchMarket();
+        }
+
+        async function fetchMarket() {
+            if (isFetching) return;
+            isFetching = true;
+            try {
+                let data = [];
+                if (currentMarket === 'DOMESTIC') {
+                    const res = await axios.get('https://api.upbit.com/v1/market/all');
+                    const krwMarkets = res.data.filter(m => m.market.startsWith('KRW-')).map(m => m.market);
+                    const tickerRes = await axios.get(`https://api.upbit.com/v1/ticker?markets=${krwMarkets.join(',')}`);
+                    data = tickerRes.data.map(t => ({
+                        s: t.market.replace('KRW-', ''), p: t.trade_price, c: (t.signed_change_rate * 100).toFixed(2), v: t.acc_trade_price_24h, cur: '₩'
+                    }));
+                } else {
+                    const res = await axios.get('https://api.binance.com/api/v3/ticker/24hr');
+                    data = res.data.filter(t => t.symbol.endsWith('USDT')).slice(0, 50).map(t => ({
+                        s: t.symbol.replace('USDT', ''), p: parseFloat(t.lastPrice), c: parseFloat(t.priceChangePercent).toFixed(2), v: parseFloat(t.quoteVolume), cur: '$'
+                    }));
+                }
+                allCoins = data.sort((a, b) => b.v - a.v);
+                renderList(allCoins);
+                updateTicker(allCoins);
+            } catch (e) {
+                console.error("데이터 오류", e);
+            } finally {
+                isFetching = false;
+            }
+        }
+
+        function renderList(data) {
+            if (data.length === 0) return;
+            const searchTerm = document.getElementById('mainSearch').value.toUpperCase();
+            const filteredData = searchTerm ? data.filter(c => c.s.includes(searchTerm)) : data;
+            
+            const listHtml = filteredData.map((i, idx) => `
+                <a href="modal.html?coin=${i.s}" class="coin-row">
+                    <span style="width:30px; font-weight:800; color:var(--text-sub);">${idx + 1}</span>
+                    <b style="flex:1; margin-left:10px;">${i.s}</b>
+                    <span style="flex:1; text-align:right;">${i.cur}${i.p.toLocaleString()}</span>
+                    <span style="width:70px; text-align:right; font-weight:800; color:${i.c >= 0 ? 'var(--up-color)' : 'var(--down-color)'}">
+                        ${i.c >= 0 ? '+' : ''}${i.c}%
+                    </span>
+                </a>
+            `).join('');
+            document.getElementById('coinList').innerHTML = listHtml;
+        }
+
+        function updateTicker(data) {
+            const tickerHtml = data.slice(0, 15).map(c => `
+                <span style="color:#fff; margin-right:30px;">
+                    ${c.s} <span style="color:${c.c >= 0 ? 'var(--up-color)' : 'var(--down-color)'}">${c.p.toLocaleString()}</span>
+                </span>
+            `).join('');
+            document.getElementById('topTicker').innerHTML = tickerHtml + tickerHtml;
+        }
+
+        document.getElementById('mainSearch').addEventListener('input', () => renderList(allCoins));
+
+        fetchMarket();
+        setInterval(fetchMarket, 3000);
+    </script>
+</body>
+</html>
