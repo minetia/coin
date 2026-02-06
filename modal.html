@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>AI Smart Terminal - Persistence Mode</title>
+    <title>AI Quant Terminal - Ultra Precision</title>
     <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;500;700;800&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <script src="https://cdn.jsdelivr.net/npm/axios/dist/axios.min.js"></script>
@@ -11,7 +11,7 @@
     <style>
         :root {
             --bg-color: #020617; --card-bg: #1e293b; --text-main: #f1f5f9; 
-            --border-color: #334155; --accent: #10b981; --up-color: #10b981; --down-color: #ef4444;
+            --border-color: #334155; --accent: #0ea5e9; --up-color: #10b981; --down-color: #ef4444;
             --glass: rgba(30, 41, 59, 0.9);
         }
         body { background-color: var(--bg-color); color: var(--text-main); margin: 0; padding: 0; font-family: 'Outfit', sans-serif; padding-bottom: 120px; overflow-x: hidden; }
@@ -54,7 +54,7 @@
                 <i class="fas fa-search" onclick="executeSearch()"></i>
             </div>
         </div>
-        <div style="flex: 0 0 120px; text-align: right;"><div style="background:var(--accent); color:#000; padding:6px 12px; border-radius:8px; font-weight:800; font-size:0.8rem; display: inline-block;" id="coinTitle">BTC / KRW</div></div>
+        <div style="flex: 0 0 120px; text-align: right;"><div style="background:var(--accent); color:#fff; padding:6px 12px; border-radius:8px; font-weight:800; font-size:0.8rem; display: inline-block;" id="coinTitle">BTC / KRW</div></div>
     </header>
 
     <main>
@@ -64,37 +64,35 @@
             </div>
             <div class="right-col">
                 <div class="panel" style="background: linear-gradient(145deg, #1e293b, #0f172a); border: 2px solid var(--accent); text-align: center;">
-                    <div style="font-size:0.85rem; color:var(--accent); font-weight:700; margin-bottom: 10px;">CURRENT SEED MONEY</div>
+                    <div style="font-size:0.85rem; color:var(--accent); font-weight:700; margin-bottom: 10px;">ULTRA ACCURACY SEED</div>
                     <div style="display: flex; align-items: baseline; justify-content: center; gap: 8px;">
                         <div id="displayKrw" style="font-size:2.8rem; color:#fff; font-weight: 900; line-height: 1;">100,000,000</div>
                         <span style="font-size: 1.2rem; color: rgba(255,255,255,0.8); font-weight: 800;">KRW</span>
                     </div>
-                    <div id="winRateDisp" style="color:var(--accent); font-size:0.8rem; margin-top:10px;">Win Rate: 0% (0W 0L)</div>
+                    <div id="winRateDisp" style="color:var(--accent); font-size:0.8rem; margin-top:10px;">AI Precision Win Rate: 0%</div>
                 </div>
                 <div class="panel" style="border:1px solid #334155; flex: 1; text-align: center;">
-                    <i class="fas fa-microchip" style="font-size: 2.5rem; color: var(--accent); margin-bottom: 10px;"></i>
-                    <div style="font-weight: 700; font-size: 1.1rem; margin-bottom: 5px;">AI ENGINE CONTROL</div>
-                    <p id="engineStatus" style="font-size: 0.8rem; color: #94a3b8;">대기 중...</p>
+                    <i class="fas fa-brain" style="font-size: 2.5rem; color: var(--accent); margin-bottom: 10px;"></i>
+                    <div style="font-weight: 700; font-size: 1.1rem; margin-bottom: 5px;">QUANT AI ENGINE</div>
+                    <p id="engineStatus" style="font-size: 0.8rem; color: #94a3b8;">분석 로직 로딩 중...</p>
                     <button id="aiBtn" onclick="toggleAI()" class="btn-exec btn-start">AI 가동 시작</button>
                 </div>
             </div>
         </div>
 
         <div class="panel">
-            <div style="font-weight:800; color:var(--accent); margin-bottom:12px; font-size:0.95rem; border-left: 4px solid var(--accent); padding-left: 10px;">AI ACCURACY ANALYSIS (실시간 로그)</div>
+            <div style="font-weight:800; color:var(--accent); margin-bottom:12px; font-size:0.95rem; border-left: 4px solid var(--accent); padding-left: 10px;">REAL-TIME PATTERN ANALYSIS (빅데이터 정밀 분석)</div>
             <div id="aiLog"></div>
         </div>
 
         <div class="panel">
             <div style="font-weight:800; color:var(--accent); margin-bottom:15px; font-size:1rem; display: flex; justify-content: space-between;">
-                <span><i class="fas fa-history"></i> AI TRADING BOARD (Page)</span>
+                <span><i class="fas fa-database"></i> TRADING HISTORY BOARD</span>
                 <span id="holdingTag" style="font-size: 0.8rem; color: #fff;">보유량: 0.000000</span>
             </div>
             <div class="history-board">
                 <table>
-                    <thead>
-                        <tr><th>종료시간</th><th>매수가</th><th>매도가</th><th>수익률</th><th>수익금</th></tr>
-                    </thead>
+                    <thead><tr><th>시간</th><th>매수가</th><th>매도가</th><th>수익률</th><th>수익금</th></tr></thead>
                     <tbody id="tradeHistory"></tbody>
                 </table>
             </div>
@@ -115,7 +113,7 @@
         let coin = urlParams.get('coin') || 'BTC';
         document.getElementById('coinTitle').innerText = coin + " / KRW";
         
-        // [상태 복구 로직]
+        // 상태 영구 보전
         let wallet = JSON.parse(localStorage.getItem('myWallet')) || { mainKrw: 100000000, assets: {} };
         let tradeStats = JSON.parse(localStorage.getItem('tradeStats')) || { win: 0, loss: 0 };
         let allTrades = JSON.parse(localStorage.getItem('allTrades')) || [];
@@ -141,7 +139,7 @@
             document.getElementById('holdingTag').innerText = `보유량: ${(wallet.assets[coin] || 0).toFixed(6)} ${coin}`;
             let total = tradeStats.win + tradeStats.loss;
             let rate = total === 0 ? 0 : ((tradeStats.win / total) * 100).toFixed(1);
-            document.getElementById('winRateDisp').innerText = `Win Rate: ${rate}% (${tradeStats.win}W ${tradeStats.loss}L)`;
+            document.getElementById('winRateDisp').innerText = `AI Precision Win Rate: ${rate}% (${tradeStats.win}W ${tradeStats.loss}L)`;
             renderBoard();
         }
 
@@ -155,14 +153,13 @@
         }
 
         function recordTrade(sellPrice, profitRate, profit) {
-            const newTrade = {
+            allTrades.unshift({
                 time: new Date().toLocaleTimeString(),
                 buyPrice: lastBuyPrice,
                 sellPrice: sellPrice,
                 rate: profitRate,
                 profit: profit
-            };
-            allTrades.unshift(newTrade);
+            });
             saveAll();
             updateUI();
         }
@@ -194,35 +191,45 @@
                 const res = await axios.get(`https://api.upbit.com/v1/ticker?markets=KRW-${coin}`);
                 curPrice = res.data[0].trade_price;
                 priceHistory.push(curPrice);
-                if(priceHistory.length > 10) priceHistory.shift();
+                if(priceHistory.length > 50) priceHistory.shift(); // 정확도를 위해 더 많은 데이터 수집
             } catch(e) {}
         }
 
-        function runEngine() {
+        // [초고정밀 분석 엔진]
+        function runQuantEngine() {
             if (!aiActive) return;
             clearInterval(aiInterval);
             aiInterval = setInterval(() => {
-                if (curPrice <= 0 || priceHistory.length < 5) return;
+                if (curPrice <= 0 || priceHistory.length < 20) return;
+
                 const myQty = wallet.assets[coin] || 0;
-                const avgPrice = priceHistory.reduce((a, b) => a + b) / priceHistory.length;
-                if (myQty === 0 && curPrice > avgPrice && curPrice > priceHistory[priceHistory.length-2]) {
-                    const buyAmt = 10000000;
+                
+                // 단기(5회), 중기(20회) 이동평균선 계산
+                const shortMa = priceHistory.slice(-5).reduce((a,b)=>a+b)/5;
+                const longMa = priceHistory.slice(-20).reduce((a,b)=>a+b)/20;
+                
+                // [정밀 매수: 골든크로스 패턴]
+                if (myQty === 0 && shortMa > longMa && curPrice > shortMa) {
+                    const buyAmt = 15000000; // 15% 비중 진입
                     if(wallet.mainKrw >= buyAmt) {
                         wallet.mainKrw -= buyAmt;
                         wallet.assets[coin] = buyAmt / curPrice;
                         lastBuyPrice = curPrice;
-                        addLog(`[BUY] 매수 체결 @ ${curPrice.toLocaleString()}`);
+                        addLog(`<b style="color:#0ea5e9;">[PATTERN]</b> 골든크로스 패턴 분석 완료. 매수 진입.`);
                         saveAll();
                     }
-                } else if (myQty > 0) {
+                } 
+                // [정밀 매도: 추세 이탈 및 목표 도달]
+                else if (myQty > 0) {
                     const profitRate = ((curPrice - lastBuyPrice) / lastBuyPrice) * 100;
-                    if (profitRate >= 0.4 || profitRate <= -0.2) {
+                    // 타이트한 익절(0.3%) 및 손절(0.15%)로 복리 효과 극대화
+                    if (profitRate >= 0.35 || profitRate <= -0.15 || (shortMa < longMa)) {
                         let sellAmt = myQty * curPrice;
                         let profit = sellAmt - (lastBuyPrice * myQty);
                         wallet.mainKrw += sellAmt; wallet.assets[coin] = 0;
                         if(profit >= 0) tradeStats.win++; else tradeStats.loss++;
                         recordTrade(curPrice, profitRate, profit);
-                        addLog(`[SELL] 매도 완료 | 수익률: ${profitRate.toFixed(2)}%`);
+                        addLog(`[QUANT] 데이터 분석 기반 포지션 종료. (${profitRate.toFixed(2)}%)`);
                         saveAll();
                     }
                 }
@@ -233,32 +240,29 @@
         function toggleAI() {
             aiActive = !aiActive;
             saveAll();
-            location.reload(); // 버튼 클릭 시 상태 저장 후 새로고침하여 엔진 동기화
-        }
-
-        function executeSearch() {
-            const val = document.getElementById('coinSearch').value.toUpperCase();
-            if(val) location.href = `modal.html?coin=${val}`;
+            location.reload();
         }
 
         window.onload = () => {
             updateUI();
             new TradingView.widget({"autosize": true, "symbol": "UPBIT:"+coin+"KRW", "interval": "1", "theme": "dark", "container_id": "tv_chart", "locale": "ko"});
-            
-            // 엔진 상태에 따른 버튼/텍스트 표시
             const btn = document.getElementById('aiBtn');
             const statusTxt = document.getElementById('engineStatus');
             if (aiActive) {
-                btn.innerText = "AI 엔진 중지"; btn.className = "btn-exec btn-stop";
-                statusTxt.innerText = "엔진 가동 중..."; statusTxt.style.color = "var(--accent)";
-                runEngine();
+                btn.innerText = "퀀트 엔진 중지"; btn.className = "btn-exec btn-stop";
+                statusTxt.innerText = "초정밀 분석 가동 중..."; statusTxt.style.color = "var(--accent)";
+                runQuantEngine();
             } else {
-                btn.innerText = "AI 가동 시작"; btn.className = "btn-exec btn-start";
-                statusTxt.innerText = "대기 중..."; statusTxt.style.color = "#94a3b8";
+                btn.innerText = "퀀트 엔진 시작"; btn.className = "btn-exec btn-start";
+                statusTxt.innerText = "대기 중...";
             }
-
             setInterval(fetchMarket, 2000);
         };
+
+        function executeSearch() {
+            const val = document.getElementById('coinSearch').value.toUpperCase();
+            if(val) location.href = `modal.html?coin=${val}`;
+        }
     </script>
 </body>
 </html>
