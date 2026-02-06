@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>AI Smart Terminal Pro - Stealth Mode</title>
+    <title>AI Smart Terminal Pro - Prudent Mode</title>
     <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;500;700;800&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <script src="https://cdn.jsdelivr.net/npm/axios/dist/axios.min.js"></script>
@@ -11,52 +11,39 @@
     <style>
         :root {
             --bg-color: #020617; --card-bg: #1e293b; --text-main: #f1f5f9; 
-            --border-color: #334155; --accent: #f59e0b; --up-color: #10b981; --down-color: #ef4444;
+            --border-color: #334155; --accent: #3b82f6; --up-color: #10b981; --down-color: #ef4444;
             --glass: rgba(30, 41, 59, 0.85);
         }
-        body { background-color: var(--bg-color); color: var(--text-main); margin: 0; padding: 0; overflow-x: hidden; font-family: 'Outfit', sans-serif; padding-bottom: 100px; }
-        
+        body { background-color: var(--bg-color); color: var(--text-main); margin: 0; padding: 0; font-family: 'Outfit', sans-serif; padding-bottom: 100px; }
         header { position: fixed; top: 0; left: 0; width: 100%; height: 75px; background: var(--glass); backdrop-filter: blur(15px); border-bottom: 1px solid var(--border-color); z-index: 10000; display: flex; align-items: center; padding: 0 20px; box-sizing: border-box; }
-        .search-wrapper { flex: 1; display: flex; justify-content: center; align-items: center; }
-        .search-container { position: relative; width: 100%; max-width: 400px; display: flex; align-items: center; }
-        .search-container input { width: 100%; height: 44px; border-radius: 12px; border: 1px solid var(--border-color); background: rgba(10, 15, 29, 0.95); color: #fff; padding: 0 50px 0 18px; outline: none; font-size: 0.95rem; }
-        .search-container i { position: absolute; right: 15px; top: 50%; transform: translateY(-50%); color: var(--accent); font-size: 1.1rem; cursor: pointer; }
-        
-        main { display: flex; flex-direction: column; gap: 15px; padding: 95px 15px 20px; box-sizing: border-box; max-width: 1400px; margin: 0 auto; }
+        .search-wrapper { flex: 1; display: flex; justify-content: center; }
+        .search-container { position: relative; width: 100%; max-width: 400px; }
+        .search-container input { width: 100%; height: 44px; border-radius: 12px; border: 1px solid var(--border-color); background: rgba(10, 15, 29, 0.95); color: #fff; padding: 0 50px 0 18px; outline: none; }
+        .search-container i { position: absolute; right: 15px; top: 50%; transform: translateY(-50%); color: var(--accent); cursor: pointer; }
+        main { display: flex; flex-direction: column; gap: 15px; padding: 95px 15px 20px; max-width: 1400px; margin: 0 auto; }
         .top-section { display: flex; flex-wrap: wrap; gap: 15px; width: 100%; }
         .center-col { flex: 1; min-width: 350px; }
         .right-col { flex: 0 0 380px; display: flex; flex-direction: column; gap: 15px; }
-        
-        /* [핵심] 호가창 숨김 처리 (display: none) */
-        .ob-area { display: none; width: 100%; order: 10; margin-top: 10px; }
-        
-        @media (max-width: 1100px) { .right-col { flex: 1 1 100%; } }
-
-        .panel { background: var(--card-bg); border-radius: 16px; border: 1px solid var(--border-color); padding: 22px; box-sizing: border-box; box-shadow: 0 10px 30px rgba(0,0,0,0.3); }
+        .panel { background: var(--card-bg); border-radius: 16px; border: 1px solid var(--border-color); padding: 22px; box-shadow: 0 10px 30px rgba(0,0,0,0.3); }
         #tv_chart_container { height: 480px; border-radius: 16px; overflow: hidden; border: 1px solid var(--border-color); background: #131722; }
-
         #aiLog { height: 350px; overflow-y: hidden; background: #020617; padding: 15px; font-size: 0.88rem; border-radius: 10px; border: 1px solid var(--border-color); color: #cbd5e1; display: flex; flex-direction: column; }
-        .log-entry { margin-bottom: 5px; border-bottom: 1px solid rgba(255,255,255,0.02); padding-bottom: 5px; animation: fadeIn 0.1s; }
-        @keyframes fadeIn { from { opacity: 0; } to { opacity: 1; } }
-        
+        .log-entry { margin-bottom: 5px; border-bottom: 1px solid rgba(255,255,255,0.02); padding-bottom: 5px; }
         .bottom-nav { position: fixed; bottom: 0; left: 0; width: 100%; height: 75px; background: rgba(15, 23, 42, 0.98); backdrop-filter: blur(15px); border-top: 1px solid var(--border-color); display: flex; justify-content: space-around; align-items: center; z-index: 10001; }
-        .nav-item { color: #94a3b8; text-decoration: none; display: flex; flex-direction: column; align-items: center; gap: 4px; flex: 1; }
+        .nav-item { color: #94a3b8; text-decoration: none; display: flex; flex-direction: column; align-items: center; flex: 1; }
         .nav-item.active { color: var(--accent); }
-        .nav-item span { font-size: 0.7rem; font-weight: 600; }
-        
         .btn-exec { width: 100%; height: 60px; border-radius: 12px; border: none; font-weight: 800; cursor: pointer; color: #fff; font-size: 1.1rem; }
     </style>
 </head>
 <body>
     <header>
-        <div onclick="history.back()" style="cursor:pointer; color:var(--text-main); font-size:1.2rem;"><i class="fas fa-chevron-left"></i></div>
+        <div onclick="history.back()" style="cursor:pointer;"><i class="fas fa-chevron-left"></i></div>
         <div class="search-wrapper">
             <div class="search-container">
                 <input type="text" id="coinSearch" placeholder="코인 종목 검색..." onkeypress="if(event.key==='Enter') executeSearch()">
                 <i class="fas fa-search" onclick="executeSearch()"></i>
             </div>
         </div>
-        <div style="flex: 0 0 120px; text-align: right;"><div style="background:var(--accent); color:#000; padding:6px 12px; border-radius:8px; font-weight:800; font-size:0.8rem; display: inline-block;" id="coinTitle">BTC / KRW</div></div>
+        <div style="flex: 0 0 120px; text-align: right;"><div style="background:var(--accent); color:#fff; padding:6px 12px; border-radius:8px; font-weight:800; font-size:0.8rem; display: inline-block;" id="coinTitle">BTC / KRW</div></div>
     </header>
 
     <main>
@@ -64,35 +51,30 @@
             <div class="center-col">
                 <div id="tv_chart_container"><div id="tv_chart" style="width: 100%; height: 100%;"></div></div>
                 <div class="panel" style="margin-top: 15px;">
-                    <div style="font-weight:800; color:var(--accent); margin-bottom:12px; font-size:0.95rem; border-left: 4px solid var(--accent); padding-left: 10px;">AI REAL-TIME ANALYSIS (최신 30개 / 자동 기동)</div>
+                    <div style="font-weight:800; color:var(--accent); margin-bottom:12px; font-size:0.95rem; border-left: 4px solid var(--accent); padding-left: 10px;">AI ANALYSIS (신중 추세 매매 모드)</div>
                     <div id="aiLog"></div>
                 </div>
             </div>
             
             <div class="right-col">
-                <div class="panel" style="background: linear-gradient(145deg, #1e293b, #0f172a); border: 2px solid #334155; text-align: center;">
+                <div class="panel" style="background: linear-gradient(145deg, #1e293b, #0f172a); border: 2px solid #3b82f6; text-align: center;">
                     <div style="font-size:0.85rem; color:var(--accent); font-weight:700; letter-spacing: 1px; margin-bottom: 10px;">CURRENT SEED MONEY</div>
                     <div style="display: flex; align-items: baseline; justify-content: center; gap: 8px;">
-                        <div id="displayKrw" style="font-size:3rem; color:#fff; font-weight: 900; text-shadow: 0 0 15px rgba(255,255,255,0.2); line-height: 1;">100,000,000</div>
+                        <div id="displayKrw" style="font-size:3rem; color:#fff; font-weight: 900; text-shadow: 0 0 15px rgba(59,130,246,0.3); line-height: 1;">100,000,000</div>
                         <span style="font-size: 1.4rem; color: rgba(255,255,255,0.8); font-weight: 800;">KRW</span>
                     </div>
                     <div id="coinQtyDisp" style="color:#10b981; font-weight:700; border-top: 1px solid rgba(255,255,255,0.1); padding-top: 10px; font-size: 0.9rem; margin-top:10px;">Holding: 0.000000 BTC</div>
                 </div>
 
-                <div class="panel" style="border:1px solid var(--accent); background: rgba(245, 158, 11, 0.05); flex: 1; display: flex; flex-direction: column; justify-content: center;">
+                <div class="panel" style="border:1px solid #334155; flex: 1; display: flex; flex-direction: column; justify-content: center;">
                     <div style="text-align: center; padding: 10px 0;">
-                        <i class="fas fa-bolt" style="font-size: 3.5rem; color: var(--accent); margin-bottom: 15px; text-shadow: 0 0 15px var(--accent);"></i>
-                        <div style="font-weight: 700; font-size: 1.2rem; margin-bottom: 5px;">SCALPING ENGINE</div>
-                        <p style="font-size: 0.85rem; color: #94a3b8; margin-bottom: 20px;">1초 주기 무한 매매 가동 중</p>
+                        <i class="fas fa-shield-alt" style="font-size: 3.5rem; color: var(--accent); margin-bottom: 15px;"></i>
+                        <div style="font-weight: 700; font-size: 1.2rem; margin-bottom: 5px;">PRUDENT ENGINE</div>
+                        <p style="font-size: 0.85rem; color: #94a3b8; margin-bottom: 20px;">상승 추세 확인 후 진입 (신중 모드)</p>
                     </div>
-                    <button id="aiBtn" onclick="toggleAI()" class="btn-exec" style="background:#ef4444; color:#fff;">AI 엔진 중지</button>
+                    <button id="aiBtn" onclick="toggleAI()" class="btn-exec" style="background:#3b82f6; color:#fff;">AI 엔진 가동 중</button>
                 </div>
             </div>
-        </div>
-
-        <div class="panel ob-area">
-            <div id="askList"></div>
-            <div id="bidList"></div>
         </div>
     </main>
 
@@ -109,7 +91,7 @@
         let coin = urlParams.get('coin') || 'BTC';
         document.getElementById('coinTitle').innerText = coin + " / KRW";
         let wallet = JSON.parse(localStorage.getItem('myWallet')) || { mainKrw: 100000000, assets: {} };
-        let curPrice = 0, lastBuyPrice = 0, aiActive = false, aiInterval;
+        let curPrice = 0, lastPrice = 0, lastBuyPrice = 0, aiActive = false, aiInterval;
 
         function updateUI() {
             document.getElementById('displayKrw').innerText = Math.floor(wallet.mainKrw).toLocaleString();
@@ -127,61 +109,41 @@
         async function fetchMarket() {
             try {
                 const res = await axios.get(`https://api.upbit.com/v1/ticker?markets=KRW-${coin}`);
+                lastPrice = curPrice;
                 curPrice = res.data[0].trade_price;
             } catch(e) {}
         }
 
-        function startEngine() {
+        function startPrudentEngine() {
             aiActive = true;
-            addLog(`<span style="color:var(--accent); font-weight:bold;">[SYSTEM] AI 엔진 자동 기동됨</span>`);
+            addLog(`<span style="color:#3b82f6; font-weight:bold;">[SYSTEM] 신중 모드 엔진 가동 시작</span>`);
             aiInterval = setInterval(() => {
-                if (curPrice <= 0) return;
-                const signal = Math.random();
-                if (signal > 0.5 && wallet.mainKrw >= 1000000) { 
-                    wallet.mainKrw -= 1000000;
-                    wallet.assets[coin] = (wallet.assets[coin] || 0) + (1000000 / curPrice);
+                if (curPrice <= 0 || lastPrice === 0) return;
+
+                const myQty = wallet.assets[coin] || 0;
+
+                // [신중 매수 로직] 코인이 없고, 현재가가 전 회차보다 올랐을 때(추세 발생) 
+                if (myQty === 0 && curPrice > lastPrice) {
+                    wallet.mainKrw -= 5000000; // 500만 원씩 신중히 매수
+                    wallet.assets[coin] = 5000000 / curPrice;
                     lastBuyPrice = curPrice;
-                    addLog(`[BUY] 1,000,000 KRW 차감 | 체결가: ${curPrice.toLocaleString()}`);
-                } else if (signal <= 0.5 && (wallet.assets[coin] || 0) > 0) { 
-                    let q = wallet.assets[coin];
-                    let sellAmt = q * curPrice;
-                    let profit = sellAmt - (lastBuyPrice * q);
-                    wallet.mainKrw += sellAmt;
-                    wallet.assets[coin] = 0;
-                    const color = profit >= 0 ? "#10b981" : "#ef4444";
-                    addLog(`[SELL] 매도 완료 | 입금: ${Math.floor(sellAmt).toLocaleString()} (<b style="color:${color}">${profit >= 0 ? '+' : ''}${Math.floor(profit).toLocaleString()}</b>)`);
+                    addLog(`[ANALYSIS] 상승 추세 감지 - 5,000,000 KRW 매수`);
+                } 
+                // [신중 매도 로직] 수익률 +0.5% 이상 또는 손절 -0.3% 이하일 때
+                else if (myQty > 0) {
+                    const profitRate = ((curPrice - lastBuyPrice) / lastBuyPrice) * 100;
+                    if (profitRate >= 0.5 || profitRate <= -0.3) {
+                        let sellAmt = myQty * curPrice;
+                        let profit = sellAmt - 5000000;
+                        wallet.mainKrw += sellAmt;
+                        wallet.assets[coin] = 0;
+                        const color = profit >= 0 ? "#10b981" : "#ef4444";
+                        addLog(`[SELL] ${profit >= 0 ? '익절' : '손절'} 완료 | 수익률: ${profitRate.toFixed(2)}% (<b style="color:${color}">${Math.floor(profit).toLocaleString()} KRW</b>)`);
+                    }
                 }
                 updateUI();
-            }, 1000);
+            }, 3000); // 3초마다 시장 분석 (신중)
         }
 
         function toggleAI() {
-            const btn = document.getElementById('aiBtn');
-            if (aiActive) {
-                clearInterval(aiInterval);
-                aiActive = false;
-                btn.innerText = "AI 엔진 시작"; btn.style.background = "var(--accent)"; btn.style.color = "#000";
-                addLog(`[SYSTEM] 엔진 중지됨`);
-            } else {
-                startEngine();
-                btn.innerText = "AI 엔진 중지"; btn.style.background = "#ef4444"; btn.style.color = "#fff";
-            }
-        }
-
-        function executeSearch() {
-            const val = document.getElementById('coinSearch').value.toUpperCase();
-            if(val) location.href = `modal.html?coin=${val}`;
-        }
-
-        window.onload = () => {
-            updateUI();
-            new TradingView.widget({
-                "autosize": true, "symbol": "UPBIT:"+coin+"KRW", "interval": "1", "theme": "dark", "container_id": "tv_chart", "locale": "ko"
-            });
-            fetchMarket();
-            setInterval(fetchMarket, 2000);
-            setTimeout(startEngine, 1500); 
-        };
-    </script>
-</body>
-</html>
+            const btn = document.getElementById('ai
