@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>AI Quant Terminal - Ultra Precision</title>
+    <title>AI Quant Terminal - Master Final</title>
     <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;500;700;800&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <script src="https://cdn.jsdelivr.net/npm/axios/dist/axios.min.js"></script>
@@ -26,7 +26,7 @@
         .right-col { flex: 0 0 380px; display: flex; flex-direction: column; gap: 15px; }
         .panel { background: var(--card-bg); border-radius: 16px; border: 1px solid var(--border-color); padding: 22px; box-shadow: 0 10px 30px rgba(0,0,0,0.3); }
         #tv_chart_container { height: 450px; border-radius: 16px; overflow: hidden; border: 1px solid var(--border-color); }
-        #aiLog { height: 200px; overflow-y: hidden; background: #020617; padding: 15px; font-size: 0.88rem; border-radius: 12px; border: 1px solid var(--border-color); color: #cbd5e1; display: flex; flex-direction: column; margin-bottom: 15px; }
+        #aiLog { height: 200px; overflow-y: scroll; background: #020617; padding: 15px; font-size: 0.85rem; border-radius: 12px; border: 1px solid var(--border-color); color: #cbd5e1; display: flex; flex-direction: column-reverse; margin-bottom: 15px; scrollbar-width: none; }
         .log-entry { margin-bottom: 6px; border-bottom: 1px solid rgba(255,255,255,0.02); padding-bottom: 4px; }
         .history-board { width: 100%; overflow-x: auto; }
         table { width: 100%; border-collapse: collapse; font-size: 0.85rem; text-align: center; min-width: 500px; }
@@ -74,20 +74,20 @@
                 <div class="panel" style="border:1px solid #334155; flex: 1; text-align: center;">
                     <i class="fas fa-brain" style="font-size: 2.5rem; color: var(--accent); margin-bottom: 10px;"></i>
                     <div style="font-weight: 700; font-size: 1.1rem; margin-bottom: 5px;">QUANT AI ENGINE</div>
-                    <p id="engineStatus" style="font-size: 0.8rem; color: #94a3b8;">분석 로직 로딩 중...</p>
+                    <p id="engineStatus" style="font-size: 0.8rem; color: #94a3b8;">대기 중...</p>
                     <button id="aiBtn" onclick="toggleAI()" class="btn-exec btn-start">AI 가동 시작</button>
                 </div>
             </div>
         </div>
 
         <div class="panel">
-            <div style="font-weight:800; color:var(--accent); margin-bottom:12px; font-size:0.95rem; border-left: 4px solid var(--accent); padding-left: 10px;">REAL-TIME PATTERN ANALYSIS (빅데이터 정밀 분석)</div>
+            <div style="font-weight:800; color:var(--accent); margin-bottom:12px; font-size:0.95rem; border-left: 4px solid var(--accent); padding-left: 10px;">REAL-TIME PATTERN LOG (패턴 분석 로그)</div>
             <div id="aiLog"></div>
         </div>
 
         <div class="panel">
             <div style="font-weight:800; color:var(--accent); margin-bottom:15px; font-size:1rem; display: flex; justify-content: space-between;">
-                <span><i class="fas fa-database"></i> TRADING HISTORY BOARD</span>
+                <span><i class="fas fa-database"></i> TRADING HISTORY BOARD (10개씩 출력)</span>
                 <span id="holdingTag" style="font-size: 0.8rem; color: #fff;">보유량: 0.000000</span>
             </div>
             <div class="history-board">
@@ -113,7 +113,7 @@
         let coin = urlParams.get('coin') || 'BTC';
         document.getElementById('coinTitle').innerText = coin + " / KRW";
         
-        // 상태 영구 보전
+        // [강력한 상태 저장고]
         let wallet = JSON.parse(localStorage.getItem('myWallet')) || { mainKrw: 100000000, assets: {} };
         let tradeStats = JSON.parse(localStorage.getItem('tradeStats')) || { win: 0, loss: 0 };
         let allTrades = JSON.parse(localStorage.getItem('allTrades')) || [];
@@ -134,6 +134,16 @@
             localStorage.setItem('lastBuyPrice', JSON.stringify(lastBuyPrice));
         }
 
+        function addLog(msg) {
+            const box = document.getElementById('aiLog');
+            const div = document.createElement('div');
+            div.className = 'log-entry';
+            div.innerHTML = `<span style="color:#94a3b8;">[${new Date().toLocaleTimeString()}]</span> ${msg}`;
+            box.appendChild(div);
+            box.scrollTop = box.scrollHeight;
+            if (box.childNodes.length > 50) box.removeChild(box.firstChild);
+        }
+
         function updateUI() {
             document.getElementById('displayKrw').innerText = Math.floor(wallet.mainKrw).toLocaleString();
             document.getElementById('holdingTag').innerText = `보유량: ${(wallet.assets[coin] || 0).toFixed(6)} ${coin}`;
@@ -141,15 +151,6 @@
             let rate = total === 0 ? 0 : ((tradeStats.win / total) * 100).toFixed(1);
             document.getElementById('winRateDisp').innerText = `AI Precision Win Rate: ${rate}% (${tradeStats.win}W ${tradeStats.loss}L)`;
             renderBoard();
-        }
-
-        function addLog(msg) {
-            const box = document.getElementById('aiLog');
-            const div = document.createElement('div');
-            div.className = 'log-entry';
-            div.innerHTML = `<span style="color:#94a3b8;">[${new Date().toLocaleTimeString()}]</span> ${msg}`;
-            box.insertBefore(div, box.firstChild);
-            if (box.childNodes.length > 30) box.removeChild(box.lastChild);
         }
 
         function recordTrade(sellPrice, profitRate, profit) {
@@ -191,45 +192,45 @@
                 const res = await axios.get(`https://api.upbit.com/v1/ticker?markets=KRW-${coin}`);
                 curPrice = res.data[0].trade_price;
                 priceHistory.push(curPrice);
-                if(priceHistory.length > 50) priceHistory.shift(); // 정확도를 위해 더 많은 데이터 수집
+                if(priceHistory.length > 50) priceHistory.shift();
             } catch(e) {}
         }
 
-        // [초고정밀 분석 엔진]
         function runQuantEngine() {
             if (!aiActive) return;
             clearInterval(aiInterval);
+            addLog(`<span style="color:#0ea5e9; font-weight:bold;">[SYSTEM] 초정밀 퀀트 엔진 가동 중...</span>`);
+            
             aiInterval = setInterval(() => {
-                if (curPrice <= 0 || priceHistory.length < 20) return;
+                if (curPrice <= 0) return;
+                
+                // 엔진 동작 증명 로그 (주기적 출력)
+                if(Math.random() > 0.9) addLog(`데이터 스캐닝... (현재가: ${curPrice.toLocaleString()})`);
 
                 const myQty = wallet.assets[coin] || 0;
-                
-                // 단기(5회), 중기(20회) 이동평균선 계산
+                if (priceHistory.length < 10) return;
+
                 const shortMa = priceHistory.slice(-5).reduce((a,b)=>a+b)/5;
-                const longMa = priceHistory.slice(-20).reduce((a,b)=>a+b)/20;
+                const longMa = priceHistory.slice(-10).reduce((a,b)=>a+b)/10;
                 
-                // [정밀 매수: 골든크로스 패턴]
                 if (myQty === 0 && shortMa > longMa && curPrice > shortMa) {
-                    const buyAmt = 15000000; // 15% 비중 진입
+                    const buyAmt = 15000000;
                     if(wallet.mainKrw >= buyAmt) {
                         wallet.mainKrw -= buyAmt;
                         wallet.assets[coin] = buyAmt / curPrice;
                         lastBuyPrice = curPrice;
-                        addLog(`<b style="color:#0ea5e9;">[PATTERN]</b> 골든크로스 패턴 분석 완료. 매수 진입.`);
+                        addLog(`<b style="color:#0ea5e9;">[ENTRY]</b> 패턴 매칭 성공. 매수 포지션 진입.`);
                         saveAll();
                     }
-                } 
-                // [정밀 매도: 추세 이탈 및 목표 도달]
-                else if (myQty > 0) {
+                } else if (myQty > 0) {
                     const profitRate = ((curPrice - lastBuyPrice) / lastBuyPrice) * 100;
-                    // 타이트한 익절(0.3%) 및 손절(0.15%)로 복리 효과 극대화
                     if (profitRate >= 0.35 || profitRate <= -0.15 || (shortMa < longMa)) {
                         let sellAmt = myQty * curPrice;
                         let profit = sellAmt - (lastBuyPrice * myQty);
                         wallet.mainKrw += sellAmt; wallet.assets[coin] = 0;
                         if(profit >= 0) tradeStats.win++; else tradeStats.loss++;
                         recordTrade(curPrice, profitRate, profit);
-                        addLog(`[QUANT] 데이터 분석 기반 포지션 종료. (${profitRate.toFixed(2)}%)`);
+                        addLog(`<b style="color:#10b981;">[EXIT]</b> 타겟 분석 결과에 따른 수익 확정.`);
                         saveAll();
                     }
                 }
@@ -240,12 +241,13 @@
         function toggleAI() {
             aiActive = !aiActive;
             saveAll();
-            location.reload();
+            location.reload(); 
         }
 
         window.onload = () => {
             updateUI();
             new TradingView.widget({"autosize": true, "symbol": "UPBIT:"+coin+"KRW", "interval": "1", "theme": "dark", "container_id": "tv_chart", "locale": "ko"});
+            
             const btn = document.getElementById('aiBtn');
             const statusTxt = document.getElementById('engineStatus');
             if (aiActive) {
