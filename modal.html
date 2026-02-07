@@ -3,11 +3,13 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>AI Quant Master Pro - 2026 Whale Watcher</title>
+    <title>AI Quant Master Pro - Server Edition</title>
     <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;500;700;800&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    
     <script src="https://cdn.jsdelivr.net/npm/axios/dist/axios.min.js"></script>
     <script type="text/javascript" src="https://s3.tradingview.com/tv.js"></script>
+
     <style>
         :root {
             --bg-color: #020617; --card-bg: #1e293b; --text-main: #f1f5f9; 
@@ -20,29 +22,34 @@
         .search-container { position: relative; width: 100%; max-width: 400px; display: flex; align-items: center; }
         .search-container input { width: 100%; height: 44px; border-radius: 12px; border: 1px solid var(--border-color); background: rgba(10, 15, 29, 0.9); color: #fff; padding: 0 50px 0 18px; outline: none; }
         .search-container i { position: absolute; right: 15px; top: 50%; transform: translateY(-50%); color: var(--accent); cursor: pointer; }
+        
         main { display: flex; flex-direction: column; gap: 15px; padding: 95px 15px 20px; box-sizing: border-box; max-width: 1400px; margin: 0 auto; }
         .top-section { display: flex; flex-wrap: wrap; gap: 15px; width: 100%; }
         .center-col { flex: 1; min-width: 350px; }
         .right-col { flex: 0 0 380px; display: flex; flex-direction: column; gap: 15px; }
+        
         .panel { background: var(--card-bg); border-radius: 16px; border: 1px solid var(--border-color); padding: 22px; box-shadow: 0 10px 30px rgba(0,0,0,0.3); }
-        #tv_chart_container { height: 450px; border-radius: 16px; overflow: hidden; border: 1px solid var(--border-color); }
+        #tv_chart_container { height: 450px; border-radius: 16px; overflow: hidden; border: 1px solid var(--border-color); background: #131722; }
+
         #aiLog { height: 220px; overflow-y: scroll; background: #020617; padding: 15px; font-size: 0.85rem; border-radius: 12px; border: 1px solid var(--border-color); color: #cbd5e1; display: flex; flex-direction: column-reverse; margin-bottom: 15px; scrollbar-width: none; }
-        .log-entry { margin-bottom: 6px; border-bottom: 1px solid rgba(255,255,255,0.02); padding-bottom: 4px; line-height: 1.4; }
+        .log-entry { margin-bottom: 6px; border-bottom: 1px solid rgba(255,255,255,0.02); padding-bottom: 4px; }
+        
         .history-board { width: 100%; overflow-x: auto; }
         table { width: 100%; border-collapse: collapse; font-size: 0.85rem; text-align: center; min-width: 550px; }
         th { background: rgba(255,255,255,0.05); color: var(--accent); padding: 12px; border-bottom: 2px solid var(--border-color); }
         td { padding: 12px; border-bottom: 1px solid rgba(255,255,255,0.05); }
+
         .pagination { display: flex; justify-content: center; align-items: center; gap: 10px; margin-top: 20px; }
         .page-btn { cursor: pointer; padding: 5px 12px; border-radius: 6px; border: 1px solid var(--border-color); background: #0f172a; color: #94a3b8; font-weight: 600; }
         .page-btn.active { background: var(--accent); color: #020617; border-color: var(--accent); }
-        .txt-up { color: var(--up-color); font-weight: 700; }
-        .txt-down { color: var(--down-color); font-weight: 700; }
-        .bottom-nav { position: fixed; bottom: 0; left: 0; width: 100%; height: 75px; background: rgba(15, 23, 42, 0.98); backdrop-filter: blur(15px); border-top: 1px solid var(--border-color); display: flex; justify-content: space-around; align-items: center; z-index: 10001; }
-        .nav-item { color: #94a3b8; text-decoration: none; display: flex; flex-direction: column; align-items: center; flex: 1; }
-        .nav-item.active { color: var(--accent); }
+
         .btn-exec { width: 100%; height: 60px; border-radius: 12px; border: none; font-weight: 800; cursor: pointer; color: #fff; font-size: 1.1rem; margin-top: 10px; }
         .btn-start { background: var(--accent); color: #020617; }
         .btn-stop { background: var(--down-color); color: #fff; }
+        
+        .bottom-nav { position: fixed; bottom: 0; left: 0; width: 100%; height: 75px; background: rgba(15, 23, 42, 0.98); backdrop-filter: blur(15px); border-top: 1px solid var(--border-color); display: flex; justify-content: space-around; align-items: center; z-index: 10001; }
+        .nav-item { color: #94a3b8; text-decoration: none; display: flex; flex-direction: column; align-items: center; flex: 1; }
+        .nav-item.active { color: var(--accent); }
     </style>
 </head>
 <body>
@@ -54,41 +61,41 @@
                 <i class="fas fa-search" onclick="executeSearch()"></i>
             </div>
         </div>
-        <div style="flex: 0 0 120px; text-align: right;"><div style="background:var(--accent); color:#fff; padding:6px 12px; border-radius:8px; font-weight:800; font-size:0.8rem; display: inline-block;" id="coinTitle">BTC / KRW</div></div>
+        <div style="flex: 0 0 120px; text-align: right;"><div id="coinTitle" style="background:var(--accent); color:#fff; padding:6px 12px; border-radius:8px; font-weight:800; font-size:0.8rem; display: inline-block;">KRW</div></div>
     </header>
 
     <main>
         <div class="top-section">
             <div class="center-col">
-                <div id="tv_chart_container"><div id="tv_chart" style="width: 100%; height: 100%;"></div></div>
+                <div id="tv_chart_container"></div>
             </div>
             <div class="right-col">
                 <div class="panel" style="background: linear-gradient(145deg, #1e293b, #0f172a); border: 2px solid var(--accent); text-align: center;">
-                    <div style="font-size:0.85rem; color:var(--accent); font-weight:700; margin-bottom: 10px;">2026 WHALE QUANT SEED</div>
+                    <div style="font-size:0.85rem; color:var(--accent); font-weight:700; margin-bottom: 10px;">QUANT SEED MONEY</div>
                     <div style="display: flex; align-items: baseline; justify-content: center; gap: 8px;">
                         <div id="displayKrw" style="font-size:2.8rem; color:#fff; font-weight: 900; line-height: 1;">100,000,000</div>
                         <span style="font-size: 1.2rem; color: rgba(255,255,255,0.8); font-weight: 800;">KRW</span>
                     </div>
-                    <div id="winRateDisp" style="color:var(--accent); font-size:0.8rem; margin-top:10px;">AI Precision Win Rate: 0%</div>
+                    <div id="winRateDisp" style="color:var(--accent); font-size:0.8rem; margin-top:10px;">Win Rate: 0%</div>
                 </div>
-                <div class="panel" style="border:1px solid #334155; flex: 1; text-align: center;">
+                <div class="panel" style="border:1px solid #334155; text-align: center;">
                     <i class="fas fa-whale" style="font-size: 2.5rem; color: var(--accent); margin-bottom: 10px;"></i>
                     <div style="font-weight: 700; font-size: 1.1rem; margin-bottom: 5px;">2026 LIVE ENGINE</div>
-                    <p id="engineStatus" style="font-size: 0.8rem; color: #94a3b8;">분석 로딩 중...</p>
+                    <p id="engineStatus" style="font-size: 0.8rem; color: #94a3b8;">대기 중...</p>
                     <button id="aiBtn" onclick="toggleAI()" class="btn-exec btn-start">AI 가동 시작</button>
                 </div>
             </div>
         </div>
 
         <div class="panel">
-            <div style="font-weight:800; color:var(--accent); margin-bottom:12px; font-size:0.95rem; border-left: 4px solid var(--accent); padding-left: 10px;">2026 REAL-TIME ANALYSIS LOG (Whale & History)</div>
+            <div style="font-weight:800; color:var(--accent); margin-bottom:12px; font-size:0.95rem; border-left: 4px solid var(--accent); padding-left: 10px;">2026 REAL-TIME ANALYSIS LOG</div>
             <div id="aiLog"></div>
         </div>
 
         <div class="panel">
             <div style="font-weight:800; color:var(--accent); margin-bottom:15px; font-size:1rem; display: flex; justify-content: space-between;">
-                <span><i class="fas fa-database"></i> TRADING HISTORY BOARD (Page)</span>
-                <span id="holdingTag" style="font-size: 0.8rem; color: #fff;">보유량: 0.000000</span>
+                <span><i class="fas fa-database"></i> TRADING HISTORY BOARD</span>
+                <span id="holdingTag" style="font-size: 0.8rem; color: #fff;">보유량: 0.00</span>
             </div>
             <div class="history-board">
                 <table>
@@ -112,8 +119,7 @@
         const urlParams = new URLSearchParams(window.location.search);
         let coin = urlParams.get('coin') || 'BTC';
         document.getElementById('coinTitle').innerText = coin + " / KRW";
-        
-        // 상태 저장소 (새로고침 무적)
+
         let wallet = JSON.parse(localStorage.getItem('myWallet')) || { mainKrw: 100000000, assets: {} };
         let tradeStats = JSON.parse(localStorage.getItem('tradeStats')) || { win: 0, loss: 0 };
         let allTrades = JSON.parse(localStorage.getItem('allTrades')) || [];
@@ -126,12 +132,6 @@
         const itemsPerPage = 10;
         let aiInterval;
 
-        const liveSignals = {
-            whale: ["고래 주소(0x7a...f4) 5,000 BTC 입금", "기관 투자자 콜드월렛 대량 이체", "2026년 거래소 보유량 최저치"],
-            news: ["현물 ETF 승인 호재 발표", "규제 강화 뉴스(FUD) 감지", "금리 동결 시그널 발생"],
-            tech: ["골든크로스 발생", "RSI 과매도 반등", "MACD 0선 돌파"]
-        };
-
         function saveAll() {
             localStorage.setItem('myWallet', JSON.stringify(wallet));
             localStorage.setItem('tradeStats', JSON.stringify(tradeStats));
@@ -142,6 +142,7 @@
 
         function addLog(msg) {
             const box = document.getElementById('aiLog');
+            if(!box) return;
             const div = document.createElement('div');
             div.className = 'log-entry';
             div.innerHTML = `<span style="color:#94a3b8;">[${new Date().toLocaleTimeString()}]</span> ${msg}`;
@@ -152,35 +153,24 @@
 
         function updateUI() {
             document.getElementById('displayKrw').innerText = Math.floor(wallet.mainKrw).toLocaleString();
-            document.getElementById('holdingTag').innerText = `보유량: ${(wallet.assets[coin] || 0).toFixed(6)} ${coin}`;
+            document.getElementById('holdingTag').innerText = `보유량: ${(wallet.assets[coin] || 0).toFixed(4)} ${coin}`;
             let total = tradeStats.win + tradeStats.loss;
             let rate = total === 0 ? 0 : ((tradeStats.win / total) * 100).toFixed(1);
             document.getElementById('winRateDisp').innerText = `AI Precision Win Rate: ${rate}% (${tradeStats.win}W ${tradeStats.loss}L)`;
             renderBoard();
         }
 
-        function recordTrade(sellPrice, profitRate, profit) {
-            allTrades.unshift({
-                time: new Date().toLocaleTimeString(),
-                buyPrice: lastBuyPrice,
-                sellPrice: sellPrice,
-                rate: profitRate,
-                profit: profit
-            });
-            saveAll();
-            updateUI();
-        }
-
         function renderBoard() {
             const tbody = document.getElementById('tradeHistory');
             const paginDiv = document.getElementById('pagination');
+            if(!tbody || !paginDiv) return;
             tbody.innerHTML = ""; paginDiv.innerHTML = "";
             const totalPages = Math.ceil(allTrades.length / itemsPerPage);
             const startIdx = (currentPage - 1) * itemsPerPage;
             allTrades.slice(startIdx, startIdx + itemsPerPage).forEach(t => {
                 const row = document.createElement('tr');
                 const colorClass = t.profit >= 0 ? 'txt-up' : 'txt-down';
-                row.innerHTML = `<td>${t.time}</td><td>${t.buyPrice.toLocaleString()}</td><td>${t.sellPrice.toLocaleString()}</td><td class="${colorClass}">${t.rate.toFixed(2)}%</td><td class="${colorClass}">${Math.floor(t.profit).toLocaleString()} KRW</td>`;
+                row.innerHTML = `<td>${t.time}</td><td>${t.buyPrice.toLocaleString()}</td><td>${t.sellPrice.toLocaleString()}</td><td style="color:${t.profit >= 0 ? '#10b981':'#ef4444'}">${t.rate.toFixed(2)}%</td><td style="color:${t.profit >= 0 ? '#10b981':'#ef4444'}">${Math.floor(t.profit).toLocaleString()}</td>`;
                 tbody.appendChild(row);
             });
             if (totalPages > 1) {
@@ -199,48 +189,34 @@
                 curPrice = res.data[0].trade_price;
                 priceHistory.push(curPrice);
                 if(priceHistory.length > 30) priceHistory.shift();
-            } catch(e) {}
+            } catch(e) { console.error("Upbit API Error"); }
         }
 
         function runEngine() {
             if (!aiActive) return;
             clearInterval(aiInterval);
-            addLog(`<span style="color:var(--accent); font-weight:bold;">[SYSTEM] 2026년 실시간 고래 추적 및 퀀트 엔진 가동</span>`);
-            
+            addLog(`<span style="color:var(--accent); font-weight:bold;">[SYSTEM] 2026 고래 추적 엔진 가동...</span>`);
             aiInterval = setInterval(() => {
-                if (curPrice <= 0) return;
-                
-                // [실시간 2026 분석 로그]
-                if(Math.random() > 0.8) {
-                    const year = Math.floor(Math.random() * (2025 - 2009 + 1)) + 2009;
-                    const rand = Math.random();
-                    if(rand > 0.7) addLog(`<span style="color:#f59e0b;">[2026 WHALE]</span> ${liveSignals.whale[Math.floor(Math.random()*3)]}`);
-                    else if(rand > 0.4) addLog(`<span style="color:#ef4444;">[BAD NEWS]</span> ${liveSignals.news[1]} (데이터 대조: ${year}년)`);
-                    else addLog(`<span style="color:#0ea5e9;">[SIGNAL]</span> ${liveSignals.tech[Math.floor(Math.random()*3)]} 포착`);
-                }
-
+                if (curPrice <= 0 || priceHistory.length < 5) return;
                 const myQty = wallet.assets[coin] || 0;
-                if (priceHistory.length < 10) return;
-
-                const shortMa = priceHistory.slice(-5).reduce((a,b)=>a+b)/5;
-                const longMa = priceHistory.slice(-10).reduce((a,b)=>a+b)/10;
+                const avgPrice = priceHistory.reduce((a,b)=>a+b)/priceHistory.length;
                 
-                if (myQty === 0 && shortMa > longMa && curPrice > shortMa) {
+                if (myQty === 0 && curPrice > avgPrice) {
                     const buyAmt = 20000000;
                     wallet.mainKrw -= buyAmt;
                     wallet.assets[coin] = buyAmt / curPrice;
                     lastBuyPrice = curPrice;
-                    addLog(`<b style="color:#0ea5e9;">[2026 ENTRY]</b> 고래 매집 구간 일치. 매수 집행.`);
+                    addLog(`<b style="color:#0ea5e9;">[ENTRY]</b> 매수 체결 @ ${curPrice.toLocaleString()}`);
                     saveAll();
                 } else if (myQty > 0) {
                     const profitRate = ((curPrice - lastBuyPrice) / lastBuyPrice) * 100;
-                    if (profitRate >= 0.35 || profitRate <= -0.15 || (shortMa < longMa)) {
+                    if (profitRate >= 0.4 || profitRate <= -0.2) {
                         let sellAmt = myQty * curPrice;
                         let profit = sellAmt - (lastBuyPrice * myQty);
                         wallet.mainKrw += sellAmt; wallet.assets[coin] = 0;
                         if(profit >= 0) tradeStats.win++; else tradeStats.loss++;
-                        recordTrade(curPrice, profitRate, profit);
-                        addLog(`<b style="color:#10b981;">[2026 EXIT]</b> 실시간 리스크 분석 완료. 포지션 종료.`);
+                        allTrades.unshift({time:new Date().toLocaleTimeString(), buyPrice:lastBuyPrice, sellPrice:curPrice, rate:profitRate, profit:profit});
+                        addLog(`<b style="color:#10b981;">[EXIT]</b> 매도 완료. 수익률: ${profitRate.toFixed(2)}%`);
                         saveAll();
                     }
                 }
@@ -254,27 +230,40 @@
             location.reload(); 
         }
 
-        window.onload = () => {
-            updateUI();
-            new TradingView.widget({"autosize": true, "symbol": "UPBIT:"+coin+"KRW", "interval": "1", "theme": "dark", "container_id": "tv_chart", "locale": "ko"});
-            
-            const btn = document.getElementById('aiBtn');
-            const statusTxt = document.getElementById('engineStatus');
-            if (aiActive) {
-                btn.innerText = "엔진 중지"; btn.className = "btn-exec btn-stop";
-                statusTxt.innerText = "실시간 분석 가동 중..."; statusTxt.style.color = "var(--accent)";
-                runEngine();
-            } else {
-                btn.innerText = "엔진 시작"; btn.className = "btn-exec btn-start";
-                statusTxt.innerText = "대기 중...";
-            }
-            setInterval(fetchMarket, 2000);
-        };
-
         function executeSearch() {
             const val = document.getElementById('coinSearch').value.toUpperCase();
             if(val) location.href = `modal.html?coin=${val}`;
         }
+
+        window.onload = function() {
+            updateUI();
+            
+            // 차트 로드 (서버 최적화 방식)
+            if (typeof TradingView !== 'undefined') {
+                new TradingView.widget({
+                    "autosize": true,
+                    "symbol": "UPBIT:" + coin + "KRW",
+                    "interval": "1",
+                    "timezone": "Asia/Seoul",
+                    "theme": "dark",
+                    "style": "1",
+                    "locale": "ko",
+                    "container_id": "tv_chart_container",
+                    "allow_symbol_change": true,
+                    "hide_side_toolbar": false
+                });
+            }
+
+            const btn = document.getElementById('aiBtn');
+            const statusTxt = document.getElementById('engineStatus');
+            if (aiActive) {
+                btn.innerText = "엔진 중지"; btn.className = "btn-exec btn-stop";
+                statusTxt.innerText = "가동 중..."; statusTxt.style.color = "var(--accent)";
+                runEngine();
+            }
+
+            setInterval(fetchMarket, 2000);
+        };
     </script>
 </body>
 </html>
