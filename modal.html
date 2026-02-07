@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>AI Quant Master - Real-time Sync</title>
+    <title>AI Quant Master - Final Edition</title>
     <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;500;700;800&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <script src="https://cdn.jsdelivr.net/npm/axios/dist/axios.min.js"></script>
@@ -19,22 +19,28 @@
         .search-area { flex: 1; display: flex; justify-content: center; }
         .search-box { position: relative; width: 100%; max-width: 300px; }
         .search-box input { width: 100%; height: 36px; border-radius: 8px; border: 1px solid var(--border-color); background: #0a0f1d; color: #fff; padding: 0 35px 0 12px; outline: none; }
+        
         main { padding: 80px 15px 120px; display: flex; flex-direction: column; gap: 20px; max-width: 1200px; margin: 0 auto; }
 
-        /* 섹션별 스타일 고정 */
-        .form-chart { background: #131722; border-radius: 16px; border: 1px solid var(--border-color); height: 500px !important; min-height: 500px !important; width: 100%; overflow: hidden; flex-shrink: 0; }
-        #tv_widget { width: 100%; height: 100%; }
-
-        .form-card { background: var(--card-bg); border-radius: 16px; border: 1px solid var(--border-color); padding: 25px; text-align: center; }
+        /* 폼 섹션 공통 스타일 */
+        .section-box { background: var(--card-bg); border-radius: 16px; border: 1px solid var(--border-color); padding: 25px; text-align: center; box-shadow: 0 8px 30px rgba(0,0,0,0.3); }
+        
+        /* 차트 고정 */
+        .form-chart { background: #131722; height: 500px !important; min-height: 500px !important; width: 100%; overflow: hidden; border-radius: 16px; border: 1px solid var(--border-color); flex-shrink: 0; }
+        
+        /* 자산 수치 강조 */
         .current-val { font-size: 2.8rem; font-weight: 900; margin: 5px 0; transition: color 0.3s; }
         .pnl-box { display: flex; justify-content: center; gap: 10px; font-size: 1.3rem; font-weight: 800; margin-top: 15px; padding-top: 15px; border-top: 1px solid rgba(255,255,255,0.1); }
+        .qty-box { margin: 12px 0; font-size: 1.1rem; color: var(--accent); font-weight: 700; background: rgba(14, 165, 233, 0.1); padding: 8px; border-radius: 8px; }
 
-        .form-ai-log { background: #000; border-radius: 12px; border: 1px solid var(--border-color); padding: 15px; height: 140px; overflow-y: auto; font-family: 'Consolas', monospace; font-size: 0.85rem; color: #10b981; line-height: 1.6; text-align: left; }
+        /* AI 로그박스 */
+        .form-ai-log { background: #000; border-radius: 12px; padding: 15px; height: 140px; overflow-y: auto; font-family: 'Consolas', monospace; font-size: 0.85rem; color: #10b981; text-align: left; border: 1px solid var(--border-color); }
+        
+        /* 버튼 및 리스트 */
         .btn-engine { width: 100%; height: 60px; border-radius: 12px; border: none; font-weight: 800; cursor: pointer; font-size: 1.1rem; }
         .btn-on { background: var(--accent); color: #000; }
         .btn-off { background: var(--down-color); color: #fff; }
-
-        table { width: 100%; border-collapse: collapse; font-size: 0.85rem; text-align: center; }
+        table { width: 100%; border-collapse: collapse; font-size: 0.85rem; text-align: center; margin-top: 10px; }
         th { color: #94a3b8; padding: 12px 8px; border-bottom: 2px solid var(--border-color); }
         td { padding: 12px 8px; border-bottom: 1px solid rgba(255,255,255,0.05); }
 
@@ -42,7 +48,7 @@
         .down { color: var(--down-color) !important; }
 
         .bottom-nav { position: fixed; bottom: 0; left: 0; width: 100%; height: 75px; background: rgba(15, 23, 42, 0.98); border-top: 1px solid var(--border-color); display: flex; justify-content: space-around; align-items: center; z-index: 10001; }
-        .nav-item { color: #94a3b8; text-decoration: none; display: flex; flex-direction: column; align-items: center; gap: 4px; flex: 1; }
+        .nav-item { color: #94a3b8; text-decoration: none; display: flex; flex-direction: column; align-items: center; gap: 4px; flex: 1; font-size: 0.75rem; }
         .nav-item.active { color: var(--accent); }
     </style>
 </head>
@@ -60,10 +66,15 @@
 <main>
     <div class="form-chart"><div id="tv_widget"></div></div>
 
-    <div class="form-card">
+    <div class="section-box">
         <div style="font-size:0.85rem; color:#94a3b8; font-weight:600;">TOTAL INVESTMENT: 100,000,000 KRW</div>
-        <div style="font-size:1rem; font-weight:700; color:#fff; margin-top:10px;">현재 총 자산</div>
+        <div style="font-size:1rem; font-weight:700; color:#fff; margin-top:15px;">현재 총 자산</div>
         <div id="totalDisplay" class="current-val">100,000,000</div>
+        
+        <div class="qty-box">
+            보유 수량: <span id="coinAmountDisplay">0.0000</span> <span id="coinSymbolDisplay">BTC</span>
+        </div>
+
         <div class="pnl-box">
             <span>수입/손해:</span>
             <span id="pnlValue">0원</span>
@@ -74,15 +85,15 @@
     </div>
 
     <div class="form-ai-log" id="aiLogBox">
-        <div><span style="color:var(--accent)">[SYSTEM]</span> AI Quant Engine Ready...</div>
+        <div><span style="color:var(--accent)">[SYSTEM]</span> 분석 엔진 동기화 완료...</div>
     </div>
 
-    <div class="form-card" style="border: 2px solid var(--accent);">
+    <div class="section-box" style="border: 2px solid var(--accent); padding: 20px;">
         <button id="aiBtn" onclick="toggleAI()" class="btn-engine btn-on">AI 자동매매 엔진 가동 시작</button>
-        <button onclick="forceReset()" style="margin-top:15px; background:none; border:none; color:#475569; text-decoration:underline; font-size:0.75rem; cursor:pointer;">데이터 전체 초기화 (1억 리셋)</button>
+        <button onclick="forceReset()" style="margin-top:15px; background:none; border:none; color:#475569; text-decoration:underline; font-size:0.75rem; cursor:pointer;">데이터 초기화</button>
     </div>
 
-    <div class="form-card">
+    <div class="section-box">
         <div style="font-weight:800; color:var(--accent); margin-bottom:15px; text-align:left;"><i class="fas fa-list-ul"></i> RECENT TRADE HISTORY</div>
         <table>
             <thead><tr><th>시간</th><th>구분</th><th>단가</th><th>수익률</th></tr></thead>
@@ -115,38 +126,37 @@
         box.scrollTop = box.scrollHeight;
     }
 
-    // [핵심] 실시간 자산 전광판 업데이트 (시세 변동 시 자동 호출)
+    // [정밀 동기화 로직]
     function updateUI() {
-        const coinQty = wallet.assets[coin] || 0;
-        const currentAssetValue = coinQty * price;
-        const totalValue = Math.floor(wallet.mainKrw + currentAssetValue);
+        if(price === 0) return;
+
+        const myCoinQty = wallet.assets[coin] || 0;
+        const currentCoinValue = myCoinQty * price;
+        const totalValue = Math.floor(wallet.mainKrw + currentCoinValue);
         const diff = totalValue - SEED;
 
-        // 1. 총 자산 표시
-        const totalDisp = document.getElementById('totalDisplay');
-        totalDisp.innerText = totalValue.toLocaleString();
-        
-        // 2. 수입/손해 표시
+        // UI 텍스트 업데이트
+        document.getElementById('totalDisplay').innerText = totalValue.toLocaleString();
+        document.getElementById('coinAmountDisplay').innerText = myCoinQty.toFixed(4);
+        document.getElementById('coinSymbolDisplay').innerText = coin;
+
         const pVal = document.getElementById('pnlValue');
         pVal.innerText = (diff >= 0 ? "+" : "") + diff.toLocaleString() + "원";
         
         // 색상 동기화
-        if(diff > 0) {
-            pVal.className = "up"; totalDisp.className = "current-val up";
-        } else if(diff < 0) {
-            pVal.className = "down"; totalDisp.className = "current-val down";
-        } else {
-            pVal.className = ""; totalDisp.className = "current-val";
-        }
+        const totalDisp = document.getElementById('totalDisplay');
+        if(diff > 0) { pVal.className = "up"; totalDisp.className = "current-val up"; }
+        else if(diff < 0) { pVal.className = "down"; totalDisp.className = "current-val down"; }
+        else { pVal.className = ""; totalDisp.className = "current-val"; }
 
-        // 3. 승률 표시
+        // 승률 표시
         const totalTrades = stats.win + stats.loss;
         const winRate = totalTrades === 0 ? "0.0" : ((stats.win / totalTrades) * 100).toFixed(1);
         document.getElementById('winRateDisplay').innerText = `AI 승률: ${winRate}% (${stats.win}승 ${stats.loss}패)`;
 
-        // 4. 거래 리스트 표시
+        // 리스트 표시
         const listBody = document.getElementById('tradeHistoryBody');
-        listBody.innerHTML = tradeHistory.length > 0 ? tradeHistory.slice(0, 15).map(item => `
+        listBody.innerHTML = tradeHistory.length > 0 ? tradeHistory.slice(0, 10).map(item => `
             <tr>
                 <td>${item.time}</td>
                 <td style="color:${item.type==='매수'?'#0ea5e9':'#ef4444'}">${item.type}</td>
@@ -156,34 +166,30 @@
         `).join('') : '<tr><td colspan="4" style="color:#475569; padding:20px;">거래 내역 없음</td></tr>';
     }
 
-    // [중요] 시세를 2초마다 가져오고 즉시 UI에 반영
     async function getPrice() {
         try {
             const r = await axios.get(`https://api.upbit.com/v1/ticker?markets=KRW-${coin}`);
             price = r.data[0].trade_price;
-            updateUI(); // 시세가 변하면 자산도 변한다!
+            updateUI();
         } catch(e) {}
     }
 
-    // AI 가상 매매 시뮬레이션
     function runAI() {
         if(!aiActive) return;
-        if(Math.random() > 0.94) {
+        if(Math.random() > 0.95) {
             const type = Math.random() > 0.5 ? '매수' : '매도';
             const mockProfit = (Math.random() * 4 - 1.5).toFixed(2);
             
-            // 실제 데이터 반영 (매매 시뮬레이션)
             if(type === '매수' && wallet.mainKrw >= 10000000) {
-                const buyAmount = 10000000;
-                wallet.mainKrw -= buyAmount;
-                wallet.assets[coin] = (wallet.assets[coin] || 0) + (buyAmount / price);
-                addLog(`${coin} 매수 집행 완료`);
-            } else if(type === '매도' && wallet.assets[coin] > 0) {
-                const sellQty = wallet.assets[coin];
-                wallet.mainKrw += sellQty * price;
+                const buyAmt = 10000000;
+                wallet.mainKrw -= buyAmt;
+                wallet.assets[coin] = (wallet.assets[coin] || 0) + (buyAmt / price);
+                addLog(`${coin} 매수 집행 완료 (수량 증가)`);
+            } else if(type === '매도' && (wallet.assets[coin] || 0) > 0) {
+                wallet.mainKrw += wallet.assets[coin] * price;
                 wallet.assets[coin] = 0;
                 if(parseFloat(mockProfit) > 0) stats.win++; else stats.loss++;
-                addLog(`${coin} 매도 집행 완료 (수익률: ${mockProfit}%)`);
+                addLog(`${coin} 전량 매도 완료 (수익률: ${mockProfit}%)`);
             }
             
             const trade = { time: new Date().toLocaleTimeString(), type, price, profit: mockProfit };
@@ -193,7 +199,7 @@
             localStorage.setItem('tradeHistory', JSON.stringify(tradeHistory));
             updateUI();
         } else {
-            addLog("고래 추적 중... 변동성 감시 중");
+            addLog("고래 지갑 추적 중... 변동 감시 중");
         }
     }
 
@@ -204,7 +210,7 @@
     }
 
     function forceReset() {
-        if(confirm("모든 데이터를 초기화하고 1억으로 리셋하시겠습니까?")) {
+        if(confirm("모든 데이터를 초기화하시겠습니까?")) {
             localStorage.clear();
             location.reload();
         }
@@ -215,7 +221,6 @@
             "container_id": "tv_widget", "width": "100%", "height": "100%",
             "symbol": "UPBIT:" + coin + "KRW", "interval": "1", "theme": "dark", "locale": "ko", "autosize": true
         });
-        
         if(aiActive) { 
             const btn = document.getElementById('aiBtn');
             btn.innerText = "AI 엔진 가동 중지"; btn.className = "btn-engine btn-off";
