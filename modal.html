@@ -3,12 +3,12 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>AI Quant Master Pro - Server Edition</title>
+    <title>AI Quant Master Pro - Stable Server</title>
     <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;500;700;800&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     
     <script src="https://cdn.jsdelivr.net/npm/axios/dist/axios.min.js"></script>
-    <script type="text/javascript" src="https://s3.tradingview.com/tv.js"></script>
+    <script src="https://s3.tradingview.com/tv.js"></script>
 
     <style>
         :root {
@@ -79,7 +79,7 @@
                     <div id="winRateDisp" style="color:var(--accent); font-size:0.8rem; margin-top:10px;">Win Rate: 0%</div>
                 </div>
                 <div class="panel" style="border:1px solid #334155; text-align: center;">
-                    <i class="fas fa-whale" style="font-size: 2.5rem; color: var(--accent); margin-bottom: 10px;"></i>
+                    <i class="fas fa-brain" style="font-size: 2.5rem; color: var(--accent); margin-bottom: 10px;"></i>
                     <div style="font-weight: 700; font-size: 1.1rem; margin-bottom: 5px;">2026 LIVE ENGINE</div>
                     <p id="engineStatus" style="font-size: 0.8rem; color: #94a3b8;">대기 중...</p>
                     <button id="aiBtn" onclick="toggleAI()" class="btn-exec btn-start">AI 가동 시작</button>
@@ -88,7 +88,7 @@
         </div>
 
         <div class="panel">
-            <div style="font-weight:800; color:var(--accent); margin-bottom:12px; font-size:0.95rem; border-left: 4px solid var(--accent); padding-left: 10px;">2026 REAL-TIME ANALYSIS LOG</div>
+            <div style="font-weight:800; color:var(--accent); margin-bottom:12px; font-size:0.95rem; border-left: 4px solid var(--accent); padding-left: 10px;">AI ANALYSIS LOG (2026 WHALE)</div>
             <div id="aiLog"></div>
         </div>
 
@@ -116,6 +116,7 @@
     </nav>
 
     <script>
+        // 전역 변수 초기화
         const urlParams = new URLSearchParams(window.location.search);
         let coin = urlParams.get('coin') || 'BTC';
         document.getElementById('coinTitle').innerText = coin + " / KRW";
@@ -126,31 +127,9 @@
         let aiActive = JSON.parse(localStorage.getItem('aiActive')) || false;
         let lastBuyPrice = JSON.parse(localStorage.getItem('lastBuyPrice')) || 0;
 
-        let curPrice = 0;
-        let priceHistory = [];
-        let currentPage = 1;
-        const itemsPerPage = 10;
-        let aiInterval;
+        let curPrice = 0, priceHistory = [], currentPage = 1, itemsPerPage = 10, aiInterval;
 
-        function saveAll() {
-            localStorage.setItem('myWallet', JSON.stringify(wallet));
-            localStorage.setItem('tradeStats', JSON.stringify(tradeStats));
-            localStorage.setItem('allTrades', JSON.stringify(allTrades));
-            localStorage.setItem('aiActive', JSON.stringify(aiActive));
-            localStorage.setItem('lastBuyPrice', JSON.stringify(lastBuyPrice));
-        }
-
-        function addLog(msg) {
-            const box = document.getElementById('aiLog');
-            if(!box) return;
-            const div = document.createElement('div');
-            div.className = 'log-entry';
-            div.innerHTML = `<span style="color:#94a3b8;">[${new Date().toLocaleTimeString()}]</span> ${msg}`;
-            box.appendChild(div);
-            box.scrollTop = box.scrollHeight;
-            if (box.childNodes.length > 50) box.removeChild(box.firstChild);
-        }
-
+        // UI 업데이트
         function updateUI() {
             document.getElementById('displayKrw').innerText = Math.floor(wallet.mainKrw).toLocaleString();
             document.getElementById('holdingTag').innerText = `보유량: ${(wallet.assets[coin] || 0).toFixed(4)} ${coin}`;
@@ -169,54 +148,49 @@
             const startIdx = (currentPage - 1) * itemsPerPage;
             allTrades.slice(startIdx, startIdx + itemsPerPage).forEach(t => {
                 const row = document.createElement('tr');
-                const colorClass = t.profit >= 0 ? 'txt-up' : 'txt-down';
                 row.innerHTML = `<td>${t.time}</td><td>${t.buyPrice.toLocaleString()}</td><td>${t.sellPrice.toLocaleString()}</td><td style="color:${t.profit >= 0 ? '#10b981':'#ef4444'}">${t.rate.toFixed(2)}%</td><td style="color:${t.profit >= 0 ? '#10b981':'#ef4444'}">${Math.floor(t.profit).toLocaleString()}</td>`;
                 tbody.appendChild(row);
             });
-            if (totalPages > 1) {
-                for (let i = 1; i <= totalPages; i++) {
-                    const btn = document.createElement('div');
-                    btn.className = `page-btn ${i === currentPage ? 'active' : ''}`;
-                    btn.innerText = i; btn.onclick = () => { currentPage = i; renderBoard(); };
-                    paginDiv.appendChild(btn);
-                }
+            for (let i = 1; i <= totalPages; i++) {
+                const btn = document.createElement('div');
+                btn.className = `page-btn ${i === currentPage ? 'active' : ''}`;
+                btn.innerText = i; btn.onclick = () => { currentPage = i; renderBoard(); };
+                paginDiv.appendChild(btn);
             }
         }
 
+        // 시장 데이터 수동
         async function fetchMarket() {
             try {
                 const res = await axios.get(`https://api.upbit.com/v1/ticker?markets=KRW-${coin}`);
                 curPrice = res.data[0].trade_price;
                 priceHistory.push(curPrice);
-                if(priceHistory.length > 30) priceHistory.shift();
-            } catch(e) { console.error("Upbit API Error"); }
+                if(priceHistory.length > 20) priceHistory.shift();
+            } catch(e) { console.error("API Error"); }
         }
 
+        // 엔진 로직
         function runEngine() {
             if (!aiActive) return;
             clearInterval(aiInterval);
-            addLog(`<span style="color:var(--accent); font-weight:bold;">[SYSTEM] 2026 고래 추적 엔진 가동...</span>`);
             aiInterval = setInterval(() => {
                 if (curPrice <= 0 || priceHistory.length < 5) return;
                 const myQty = wallet.assets[coin] || 0;
-                const avgPrice = priceHistory.reduce((a,b)=>a+b)/priceHistory.length;
+                const avg = priceHistory.reduce((a,b)=>a+b)/priceHistory.length;
                 
-                if (myQty === 0 && curPrice > avgPrice) {
-                    const buyAmt = 20000000;
+                if (myQty === 0 && curPrice > avg) {
+                    const buyAmt = 15000000;
                     wallet.mainKrw -= buyAmt;
                     wallet.assets[coin] = buyAmt / curPrice;
                     lastBuyPrice = curPrice;
-                    addLog(`<b style="color:#0ea5e9;">[ENTRY]</b> 매수 체결 @ ${curPrice.toLocaleString()}`);
                     saveAll();
                 } else if (myQty > 0) {
-                    const profitRate = ((curPrice - lastBuyPrice) / lastBuyPrice) * 100;
-                    if (profitRate >= 0.4 || profitRate <= -0.2) {
-                        let sellAmt = myQty * curPrice;
-                        let profit = sellAmt - (lastBuyPrice * myQty);
-                        wallet.mainKrw += sellAmt; wallet.assets[coin] = 0;
+                    const rate = ((curPrice - lastBuyPrice) / lastBuyPrice) * 100;
+                    if (rate >= 0.4 || rate <= -0.2) {
+                        let profit = (myQty * curPrice) - (myQty * lastBuyPrice);
+                        wallet.mainKrw += (myQty * curPrice); wallet.assets[coin] = 0;
                         if(profit >= 0) tradeStats.win++; else tradeStats.loss++;
-                        allTrades.unshift({time:new Date().toLocaleTimeString(), buyPrice:lastBuyPrice, sellPrice:curPrice, rate:profitRate, profit:profit});
-                        addLog(`<b style="color:#10b981;">[EXIT]</b> 매도 완료. 수익률: ${profitRate.toFixed(2)}%`);
+                        allTrades.unshift({time:new Date().toLocaleTimeString(), buyPrice:lastBuyPrice, sellPrice:curPrice, rate:rate, profit:profit});
                         saveAll();
                     }
                 }
@@ -226,8 +200,15 @@
 
         function toggleAI() {
             aiActive = !aiActive;
-            saveAll();
+            localStorage.setItem('aiActive', JSON.stringify(aiActive));
             location.reload(); 
+        }
+
+        function saveAll() {
+            localStorage.setItem('myWallet', JSON.stringify(wallet));
+            localStorage.setItem('tradeStats', JSON.stringify(tradeStats));
+            localStorage.setItem('allTrades', JSON.stringify(allTrades));
+            localStorage.setItem('lastBuyPrice', JSON.stringify(lastBuyPrice));
         }
 
         function executeSearch() {
@@ -235,25 +216,26 @@
             if(val) location.href = `modal.html?coin=${val}`;
         }
 
-        window.onload = function() {
+        // 서버 로딩 지연 방지용 초기화
+        window.addEventListener('load', function() {
             updateUI();
             
-            // 차트 로드 (서버 최적화 방식)
-            if (typeof TradingView !== 'undefined') {
-                new TradingView.widget({
-                    "autosize": true,
-                    "symbol": "UPBIT:" + coin + "KRW",
-                    "interval": "1",
-                    "timezone": "Asia/Seoul",
-                    "theme": "dark",
-                    "style": "1",
-                    "locale": "ko",
-                    "container_id": "tv_chart_container",
-                    "allow_symbol_change": true,
-                    "hide_side_toolbar": false
-                });
-            }
+            // 1. 차트 로드 (트레이딩뷰 위젯 로드 확인 후 실행)
+            const checkTV = setInterval(() => {
+                if (typeof TradingView !== 'undefined') {
+                    clearInterval(checkTV);
+                    new TradingView.widget({
+                        "autosize": true,
+                        "symbol": "UPBIT:" + coin + "KRW",
+                        "interval": "1",
+                        "theme": "dark",
+                        "container_id": "tv_chart_container",
+                        "locale": "ko"
+                    });
+                }
+            }, 500);
 
+            // 2. 엔진 상태 확인
             const btn = document.getElementById('aiBtn');
             const statusTxt = document.getElementById('engineStatus');
             if (aiActive) {
@@ -262,8 +244,10 @@
                 runEngine();
             }
 
+            // 3. 데이터 갱신 시작
+            fetchMarket();
             setInterval(fetchMarket, 2000);
-        };
+        });
     </script>
 </body>
 </html>
