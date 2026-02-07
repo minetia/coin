@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>AI Quant Master Pro - Full Restore</title>
+    <title>AI Quant Master - System Log Fixed</title>
     <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;500;700;800&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <script src="https://cdn.jsdelivr.net/npm/axios/dist/axios.min.js"></script>
@@ -15,48 +15,39 @@
             --border-color: #334155; --accent: #0ea5e9; --up-color: #10b981; --down-color: #ef4444;
         }
         body { background-color: var(--bg-color); color: var(--text-main); margin: 0; padding: 0; font-family: 'Outfit', sans-serif; overflow-x: hidden; }
-        
         header { position: fixed; top: 0; width: 100%; height: 65px; background: rgba(15, 23, 42, 0.98); border-bottom: 1px solid var(--border-color); z-index: 1000; display: flex; align-items: center; padding: 0 15px; box-sizing: border-box; }
         .search-area { flex: 1; display: flex; justify-content: center; }
         .search-box { position: relative; width: 100%; max-width: 300px; }
         .search-box input { width: 100%; height: 36px; border-radius: 8px; border: 1px solid var(--border-color); background: #0a0f1d; color: #fff; padding: 0 35px 0 12px; outline: none; }
-
         main { padding: 80px 15px 120px; display: flex; flex-direction: column; gap: 20px; max-width: 1200px; margin: 0 auto; }
 
-        /* 1. 차트 폼 */
-        .form-chart { background: #131722; border-radius: 16px; border: 1px solid var(--border-color); height: 480px !important; min-height: 480px; width: 100%; overflow: hidden; flex-shrink: 0; }
+        /* 차트 영역 고정 */
+        .form-chart { background: #131722; border-radius: 16px; border: 1px solid var(--border-color); height: 500px !important; min-height: 500px !important; width: 100%; overflow: hidden; flex-shrink: 0; }
         #tv_widget { width: 100%; height: 100%; }
 
-        /* 2. 자산 현황 폼 */
-        .form-assets { background: var(--card-bg); border-radius: 16px; border: 1px solid var(--border-color); padding: 25px; text-align: center; }
-        .current-val { font-size: 2.8rem; font-weight: 900; margin: 5px 0; color: #fff; }
-        .pnl-box { display: flex; justify-content: center; gap: 10px; font-size: 1.3rem; font-weight: 800; margin-top: 15px; padding-top: 15px; border-top: 1px solid rgba(255,255,255,0.1); }
+        /* 자산 및 로그 폼 */
+        .form-card { background: var(--card-bg); border-radius: 16px; border: 1px solid var(--border-color); padding: 25px; text-align: center; }
+        
+        /* [복구] 시스템 로그 박스 스타일 */
+        .form-ai-log { 
+            background: #000; border-radius: 12px; border: 1px solid var(--border-color); 
+            padding: 15px; height: 160px; overflow-y: auto; 
+            font-family: 'Consolas', monospace; font-size: 0.85rem; color: #10b981; 
+            line-height: 1.6; text-align: left;
+        }
+        .log-time { color: var(--accent); font-weight: bold; margin-right: 8px; }
 
-        /* 3. [복구] AI 분석 로그 폼 (자동매매 위에 배치) */
-        .form-ai-log { background: #020617; border-radius: 12px; border: 1px solid var(--border-color); padding: 15px; height: 120px; overflow-y: auto; font-family: 'Consolas', monospace; font-size: 0.85rem; color: #94a3b8; line-height: 1.5; }
-        .log-entry { margin-bottom: 5px; border-bottom: 1px solid rgba(255,255,255,0.03); padding-bottom: 3px; }
-        .log-time { color: var(--accent); margin-right: 8px; font-weight: 700; }
-
-        /* 4. 자동매매 컨트롤 폼 */
-        .form-controls { background: var(--card-bg); border-radius: 16px; border: 2.5px solid var(--accent); padding: 20px; text-align: center; }
         .btn-engine { width: 100%; height: 60px; border-radius: 12px; border: none; font-weight: 800; cursor: pointer; font-size: 1.1rem; }
         .btn-on { background: var(--accent); color: #000; }
         .btn-off { background: var(--down-color); color: #fff; }
 
-        /* 5. 거래 리스트 폼 */
-        .form-list { background: var(--card-bg); border-radius: 16px; border: 1px solid var(--border-color); padding: 20px; overflow-x: auto; }
-        table { width: 100%; border-collapse: collapse; font-size: 0.85rem; min-width: 400px; text-align: center; }
+        table { width: 100%; border-collapse: collapse; font-size: 0.85rem; text-align: center; }
         th { color: #94a3b8; padding: 12px 8px; border-bottom: 2px solid var(--border-color); }
         td { padding: 12px 8px; border-bottom: 1px solid rgba(255,255,255,0.05); }
 
-        /* 하단 메뉴 */
         .bottom-nav { position: fixed; bottom: 0; left: 0; width: 100%; height: 75px; background: rgba(15, 23, 42, 0.98); border-top: 1px solid var(--border-color); display: flex; justify-content: space-around; align-items: center; z-index: 10001; }
         .nav-item { color: #94a3b8; text-decoration: none; display: flex; flex-direction: column; align-items: center; gap: 4px; flex: 1; }
         .nav-item.active { color: var(--accent); }
-        .nav-item i { font-size: 1.3rem; }
-
-        .up { color: var(--up-color); }
-        .down { color: var(--down-color); }
     </style>
 </head>
 <body>
@@ -67,34 +58,29 @@
         <input type="text" id="coinIn" placeholder="코인 종목 검색..." onkeypress="if(event.key==='Enter') search()">
         <i class="fas fa-search" style="position:absolute; right:10px; top:10px; color:var(--accent);" onclick="search()"></i>
     </div></div>
-    <div id="badge" style="background:var(--accent); color:#fff; padding:4px 12px; border-radius:8px; font-weight:800; font-size:0.8rem;">BTC</div>
+    <div id="badge" style="background:var(--accent); color:#fff; padding:4px 10px; border-radius:6px; font-weight:800; font-size:0.75rem;">BTC</div>
 </header>
 
 <main>
     <div class="form-chart"><div id="tv_widget"></div></div>
 
-    <div class="form-assets">
-        <div style="font-size:0.85rem; color:#94a3b8; font-weight:600;">SEED INVESTMENT: 100,000,000 KRW</div>
-        <div style="font-size:1.1rem; font-weight:700; color:#fff; margin-top:10px;">현재 총 자산</div>
-        <div id="totalDisplay" class="current-val">100,000,000</div>
-        <div class="pnl-box">
-            <span id="pnlLabel">수입 / 손해 :</span>
-            <span id="pnlValue">없음 0원</span>
-        </div>
-        <div id="winStat" style="margin-top:10px; font-size:0.9rem; color:var(--accent); font-weight:800;">AI 승률: 0.0% (0승 0패)</div>
+    <div class="form-card">
+        <div style="font-size:0.85rem; color:#94a3b8; font-weight:600;">SEED: 100,000,000 KRW</div>
+        <div id="totalDisplay" style="font-size:2.8rem; font-weight:900; margin:10px 0;">100,000,000</div>
+        <div style="font-weight:800; font-size:1.2rem;">수입/손해: <span id="pnlValue">0원</span></div>
     </div>
 
     <div class="form-ai-log" id="aiLogBox">
-        <div class="log-entry"><span class="log-time">[SYSTEM]</span> 2026 WHALE TRACKING ENGINE READY...</div>
+        <div><span class="log-time">[SYSTEM]</span> AI Quant Engine Ready... 가동 대기 중.</div>
     </div>
 
-    <div class="form-controls">
+    <div class="form-card" style="border: 2px solid var(--accent);">
         <button id="aiBtn" onclick="toggleAI()" class="btn-engine btn-on">AI 자동매매 엔진 가동 시작</button>
-        <button onclick="forceReset()" style="margin-top:15px; background:none; border:none; color:#475569; text-decoration:underline; cursor:pointer; font-size:0.75rem;">기존 데이터 전체 초기화</button>
+        <button onclick="forceReset()" style="margin-top:15px; background:none; border:none; color:#475569; text-decoration:underline; font-size:0.75rem; cursor:pointer;">데이터 초기화</button>
     </div>
 
-    <div class="form-list">
-        <div style="font-weight:800; color:var(--accent); margin-bottom:15px;"><i class="fas fa-list-ul"></i> RECENT TRADE HISTORY</div>
+    <div class="form-card">
+        <div style="font-weight:800; color:var(--accent); margin-bottom:15px; text-align:left;"><i class="fas fa-list-ul"></i> RECENT TRADE HISTORY</div>
         <table>
             <thead><tr><th>시간</th><th>구분</th><th>단가</th><th>수익률</th></tr></thead>
             <tbody id="tradeHistoryBody"></tbody>
@@ -105,9 +91,8 @@
 <nav class="bottom-nav">
     <a href="https://minetia.github.io/Home/" class="nav-item"><i class="fas fa-home"></i><span>Home</span></a>
     <a href="https://minetia.github.io/business/" class="nav-item"><i class="fas fa-briefcase"></i><span>Biz</span></a>
-    <a href="https://minetia.github.io/tech/" class="nav-item"><i class="fas fa-microchip"></i><span>Tech</span></a>
-    <a href="https://minetia.github.io/news/" class="nav-item"><i class="fas fa-newspaper"></i><span>News</span></a>
     <a href="#" class="nav-item active"><i class="fas fa-chart-line"></i><span>Trade</span></a>
+    <a href="https://minetia.github.io/news/" class="nav-item"><i class="fas fa-newspaper"></i><span>News</span></a>
 </nav>
 
 <script>
@@ -117,28 +102,25 @@
     document.getElementById('badge').innerText = coin;
 
     let wallet = JSON.parse(localStorage.getItem('myWallet')) || { mainKrw: SEED, assets: {} };
-    let stats = JSON.parse(localStorage.getItem('tradeStats')) || { win: 0, loss: 0 };
     let tradeHistory = JSON.parse(localStorage.getItem('tradeHistory')) || [];
     let aiActive = JSON.parse(localStorage.getItem('aiActive')) || false;
     let price = 0;
 
+    // [수정] 로그 기록 함수
     function addLog(msg) {
         const box = document.getElementById('aiLogBox');
         const now = new Date().toLocaleTimeString();
-        box.innerHTML += `<div class="log-entry"><span class="log-time">[${now}]</span> ${msg}</div>`;
-        box.scrollTop = box.scrollHeight;
+        box.innerHTML += `<div><span class="log-time">[${now}]</span> ${msg}</div>`;
+        box.scrollTop = box.scrollHeight; // 항상 최신 로그 유지
     }
 
-    function search() {
-        const v = document.getElementById('coinIn').value.toUpperCase().trim();
-        if(v) location.href = `modal.html?coin=${v}`;
-    }
-
-    function forceReset() {
-        if(confirm("모든 데이터를 리셋할까요?")) {
-            localStorage.clear();
-            location.reload();
-        }
+    // [수정] 거래 기록 및 UI 동기화
+    function recordTrade(type, price, profit) {
+        const trade = { time: new Date().toLocaleTimeString(), type, price, profit };
+        tradeHistory.unshift(trade);
+        if(tradeHistory.length > 20) tradeHistory.pop();
+        localStorage.setItem('tradeHistory', JSON.stringify(tradeHistory));
+        updateUI();
     }
 
     function updateUI() {
@@ -147,21 +129,45 @@
         const diff = total - SEED;
 
         document.getElementById('totalDisplay').innerText = total.toLocaleString();
-        const pLabel = document.getElementById('pnlLabel');
-        const pValue = document.getElementById('pnlValue');
-
-        if(diff > 0) { pLabel.innerText="수입 :"; pValue.innerText="+"+diff.toLocaleString()+"원"; pValue.className="up"; }
-        else if(diff < 0) { pLabel.innerText="손해 :"; pValue.innerText=diff.toLocaleString()+"원"; pValue.className="down"; }
-        else { pLabel.innerText="수입 / 손해 :"; pValue.innerText="없음 0원"; pValue.className=""; }
-
-        const totalT = stats.win + stats.loss;
-        const rate = totalT === 0 ? "0.0" : ((stats.win / totalT) * 100).toFixed(1);
-        document.getElementById('winStat').innerText = `AI 승률: ${rate}% (${stats.win}승 ${stats.loss}패)`;
+        const pVal = document.getElementById('pnlValue');
+        pVal.innerText = (diff >= 0 ? "+" : "") + diff.toLocaleString() + "원";
+        pVal.style.color = diff > 0 ? "#10b981" : (diff < 0 ? "#ef4444" : "#fff");
 
         const listBody = document.getElementById('tradeHistoryBody');
-        listBody.innerHTML = tradeHistory.length > 0 ? tradeHistory.slice(0, 10).map(item => `
-            <tr><td>${item.time}</td><td style="color:${item.type==='매수'?'#0ea5e9':'#ef4444'}">${item.type}</td><td>${item.price.toLocaleString()}</td><td class="${item.profit>=0?'up':'down'}">${item.profit}%</td></tr>
+        listBody.innerHTML = tradeHistory.length > 0 ? tradeHistory.map(item => `
+            <tr>
+                <td>${item.time}</td>
+                <td style="color:${item.type==='매수'?'#0ea5e9':'#ef4444'}">${item.type}</td>
+                <td>${item.price.toLocaleString()}</td>
+                <td style="color:${item.profit>=0?'#10b981':'#ef4444'}">${item.profit}%</td>
+            </tr>
         `).join('') : '<tr><td colspan="4" style="color:#475569; padding:20px;">내역 없음</td></tr>';
+    }
+
+    // [복구] 실시간 AI 분석 시뮬레이션
+    const aiMessages = [
+        "고래들의 대량 매집 흔적 포착...",
+        "RSI 지표 과매도 구간 진입, 반등 대기 중",
+        "호가창 잔량 분석: 매수 우위 상태 확인",
+        "MACD 골든크로스 발생 직전...",
+        "상승 추세선 지지 확인 완료",
+        "AI 딥러닝 모델: 현재가 저점 판단 중"
+    ];
+
+    function runAI() {
+        if(!aiActive) return;
+        
+        // 1. 단순 분석 로그 출력
+        const msg = aiMessages[Math.floor(Math.random() * aiMessages.length)];
+        addLog(msg);
+
+        // 2. 가상 거래 발생 로직 (확률 조절)
+        if(Math.random() > 0.92) {
+            const type = Math.random() > 0.5 ? '매수' : '매도';
+            const profit = (Math.random() * 5 - 2).toFixed(2);
+            addLog(`>>> [시그널 포착] ${coin} ${type} 집행 시작`);
+            recordTrade(type, price, profit);
+        }
     }
 
     async function getPrice() {
@@ -178,17 +184,25 @@
         location.reload();
     }
 
+    function forceReset() {
+        if(confirm("모든 데이터를 초기화하시겠습니까?")) {
+            localStorage.clear();
+            location.reload();
+        }
+    }
+
     window.onload = function() {
         new TradingView.widget({
-            "container_id": "tv_widget",
-            "width": "100%", "height": "100%",
-            "symbol": "UPBIT:" + coin + "KRW",
-            "interval": "1", "theme": "dark", "locale": "ko", "autosize": true
+            "container_id": "tv_widget", "width": "100%", "height": "100%",
+            "symbol": "UPBIT:" + coin + "KRW", "interval": "1", "theme": "dark", "locale": "ko", "autosize": true
         });
+        
         if(aiActive) { 
             const btn = document.getElementById('aiBtn');
-            btn.innerText="AI 엔진 가동 중지"; btn.className="btn-engine btn-off";
-            addLog(`ENGINE START: Tracking KRW-${coin} Whales...`);
+            btn.innerText = "AI 엔진 가동 중지";
+            btn.className = "btn-engine btn-off";
+            addLog("WHALE WATCHER v2.0 가동 시작...");
+            setInterval(runAI, 5000); // 5초마다 분석 및 로그 기록
         }
         getPrice(); setInterval(getPrice, 2000);
     };
