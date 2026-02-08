@@ -2,58 +2,55 @@
 <html lang="ko">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <link rel="stylesheet" href="https://minetia.github.io/style.css">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>AI 자동매매 상세</title>
+    
+    <link rel="stylesheet" href="https://minetia.github.io/coin-style.css">
+    
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
-    <script src="https://s3.tradingview.com/tv.js"></script>
-    <script src="https://minetia.github.io/script.js"></script> </head>
+    <script src="https://cdn.jsdelivr.net/npm/axios/dist/axios.min.js"></script>
+    <script type="text/javascript" src="https://s3.tradingview.com/tv.js"></script>
+</head>
 <body>
-<div class="wrapper">
-    <div class="back-btn" onclick="history.back()">
-        <i class="fas fa-chevron-left"></i>
-    </div>
 
+<div class="wrapper">
     <header id="header-placeholder"></header>
 
     <main>
-        <div id="tv_chart" class="chart-box"></div>
-        
-        <div class="ai-terminal">
-            <div style="font-size:0.7rem; color:var(--accent); font-weight:800; margin-bottom:2px;">AI ENGINE LOG</div>
-            <div id="aiLogs" class="log-screen"></div>
-            <button onclick="window.AI_ENGINE.toggle('startBtn', 'aiLogs')" class="ai-btn" id="startBtn">
-                <i class="fas fa-robot"></i> AI 자동매매 가동
-            </button>
+        <div class="detail-header">
+            <div class="back-btn" onclick="location.href='https://minetia.github.io/index.html'">
+                <i class="fas fa-arrow-left"></i>
+            </div>
+            <div class="coin-info">
+                <span id="coin-name-display" class="coin-title">로딩중...</span>
+            </div>
         </div>
 
-        <div class="history-title">TRADE HISTORY</div>
-        <div id="history-placeholder" class="history-card"></div>
+        <div id="tv_chart" class="chart-container"></div>
+
+        <div class="trade-section">
+            <div class="section-title">
+                <i class="fas fa-robot"></i> AI 실시간 자동매매 현황
+            </div>
+            <table>
+                <thead>
+                    <tr>
+                        <th width="25%">시간</th>
+                        <th width="20%">포지션</th>
+                        <th width="30%">가격</th>
+                        <th width="25%">수량</th>
+                    </tr>
+                </thead>
+                <tbody id="trade-list-body">
+                    </tbody>
+            </table>
+        </div>
     </main>
 
     <footer id="nav-placeholder"></footer>
 </div>
 
-<div id="engine-placeholder" style="display:none;"></div>
+<script src="https://minetia.github.io/coin-script.js"></script>
 
-<script>
-    const params = new URLSearchParams(window.location.search);
-    const symbol = params.get('symbol') || 'UPBIT:BTCKRW';
-
-    window.onload = async () => {
-        // 모든 리소스(헤더, 네비, 엔진, 히스토리) 한 번에 업어오기
-        await includeResources([
-            { id: 'header-placeholder', file: 'header.html' },
-            { id: 'nav-placeholder', file: 'nav.html' },
-            { id: 'engine-placeholder', file: 'engine.html' },
-            { id: 'history-placeholder', file: 'history.html' }
-        ]);
-        
-        // 차트 실행
-        initTradingView(symbol);
-        
-        // 리스트 즉시 렌더링
-        if(window.renderHistory) window.renderHistory(1);
-    };
-</script>
 </body>
 </html>
