@@ -3,10 +3,8 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>AI 자동매매 상세</title>
-    
+    <title>AI 매매 상세</title>
     <link rel="stylesheet" href="https://minetia.github.io/coin-style.css">
-    
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <script src="https://cdn.jsdelivr.net/npm/axios/dist/axios.min.js"></script>
     <script type="text/javascript" src="https://s3.tradingview.com/tv.js"></script>
@@ -22,29 +20,14 @@
                 <i class="fas fa-arrow-left"></i>
             </div>
             <div class="coin-info">
-                <span id="coin-name-display" class="coin-title">로딩중...</span>
+                <span id="coin-name-display" class="coin-title">Loading...</span>
             </div>
         </div>
 
         <div id="tv_chart" class="chart-container"></div>
 
-        <div class="trade-section">
-            <div class="section-title">
-                <i class="fas fa-robot"></i> AI 실시간 자동매매 현황
-            </div>
-            <table>
-                <thead>
-                    <tr>
-                        <th width="25%">시간</th>
-                        <th width="20%">포지션</th>
-                        <th width="30%">가격</th>
-                        <th width="25%">수량</th>
-                    </tr>
-                </thead>
-                <tbody id="trade-list-body">
-                    </tbody>
-            </table>
-        </div>
+        <div id="history-placeholder"></div>
+
     </main>
 
     <footer id="nav-placeholder"></footer>
