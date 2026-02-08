@@ -1,3 +1,12 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+    <meta charset="UTF-8">
+    <link rel="stylesheet" href="https://minetia.github.io/style.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <script src="https://s3.tradingview.com/tv.js"></script>
+</head>
+<body>
 <div class="wrapper">
     <div class="back-btn" onclick="history.back()">
         <i class="fas fa-chevron-left"></i>
@@ -10,15 +19,47 @@
         
         <div class="ai-terminal">
             <div style="font-size:0.7rem; color:var(--accent); font-weight:800; margin-bottom:4px;">AI ENGINE LOG</div>
-            <div id="aiLogs" class="log-screen" style="height:70px;"></div>
+            <div id="aiLogs" class="log-screen"></div>
             <button onclick="window.AI_ENGINE.toggle('startBtn', 'aiLogs')" class="ai-btn" id="startBtn">
                 <i class="fas fa-robot"></i> AI 자동매매 가동
             </button>
         </div>
 
-        <div class="history-title" style="margin: 8px 0 5px 5px !important;">TRADE HISTORY</div>
-        <div id="history-placeholder" class="history-card" style="max-height: 160px;"></div>
+        <div class="history-title">TRADE HISTORY</div>
+        <div id="history-placeholder" class="history-card"></div>
     </main>
 
     <footer id="nav-placeholder"></footer>
 </div>
+
+<div id="engine-placeholder" style="display:none;"></div>
+
+<script>
+    const BASE = "https://minetia.github.io/";
+    async function initModal() {
+        const [h, n, e, hi] = await Promise.all([
+            fetch(BASE + 'header.html').then(r => r.text()),
+            fetch(BASE + 'nav.html').then(r => r.text()),
+            fetch(BASE + 'engine.html').then(r => r.text()),
+            fetch(BASE + 'history.html').then(r => r.text())
+        ]);
+        document.getElementById('header-placeholder').innerHTML = h;
+        document.getElementById('nav-placeholder').innerHTML = n;
+        document.getElementById('engine-placeholder').innerHTML = e;
+        document.getElementById('history-placeholder').innerHTML = hi;
+
+        // 스크립트 강제 주입
+        [document.getElementById('engine-placeholder'), document.getElementById('history-placeholder')].forEach(div => {
+            div.querySelectorAll('script').forEach(s => {
+                const ns = document.createElement('script');
+                ns.text = s.text;
+                document.head.appendChild(ns).parentNode.removeChild(ns);
+            });
+        });
+
+        new TradingView.widget({ "container_id": "tv_chart", "symbol": "UPBIT:BTCKRW", "interval": "1", "theme": "dark", "autosize": true, "locale": "ko" });
+    }
+    window.onload = initModal;
+</script>
+</body>
+</html>
