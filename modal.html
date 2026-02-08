@@ -2,7 +2,6 @@
 <html lang="ko">
 <head>
     <link rel="stylesheet" href="https://minetia.github.io/style.css">
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <script src="https://s3.tradingview.com/tv.js"></script>
 </head>
 <body>
@@ -10,15 +9,10 @@
     <header id="header-placeholder"></header>
     <main>
         <div id="tv_chart" class="chart-box"></div>
-        
         <div class="ai-terminal">
             <div id="aiLogs" class="log-screen"></div>
-            <button onclick="window.AI_ENGINE.toggle('startBtn', 'aiLogs')" class="ai-btn" id="startBtn">
-                <i class="fas fa-robot"></i> AI 자동매매 가동
-            </button>
+            <button onclick="window.AI_ENGINE.toggle('startBtn', 'aiLogs')" class="ai-btn" id="startBtn">AI 가동</button>
         </div>
-
-        <div class="history-title"><i class="fas fa-list-ul"></i> TRADE HISTORY</div>
         <div id="history-placeholder" class="history-card"></div>
     </main>
     <footer id="nav-placeholder"></footer>
@@ -39,7 +33,7 @@
         document.getElementById('engine-placeholder').innerHTML = e;
         document.getElementById('history-placeholder').innerHTML = hi;
 
-        // 스크립트 강제 주입 (엔진 & 리스트 로직 깨우기)
+        // [핵심] 스크립트 강제 깨우기 (Injection)
         [document.getElementById('engine-placeholder'), document.getElementById('history-placeholder')].forEach(div => {
             div.querySelectorAll('script').forEach(s => {
                 const ns = document.createElement('script');
@@ -48,8 +42,8 @@
             });
         });
 
+        // 차트 실행
         new TradingView.widget({ "container_id": "tv_chart", "symbol": "UPBIT:BTCKRW", "interval": "1", "theme": "dark", "autosize": true });
-        if(window.renderHistory) window.renderHistory(1);
     }
     window.onload = initModal;
 </script>
