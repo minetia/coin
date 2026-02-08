@@ -3,103 +3,113 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>AI Terminal - All Included</title>
+    <title>AI Terminal - Scroll Fixed</title>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <script src="https://s3.tradingview.com/tv.js"></script>
     <style>
         :root { --bg: #020617; --card: #1e293b; --accent: #0ea5e9; --border: #334155; }
-        body { margin: 0; background: var(--bg); color: #fff; font-family: sans-serif; overflow: hidden; }
-        .wrapper { display: flex; flex-direction: column; height: 100vh; }
         
-        /* 헤더 고정 */
-        header#header-placeholder { height: 65px; flex-shrink: 0; border-bottom: 1px solid var(--border); z-index: 1000; }
-        
-        /* 메인 영역: 하단 메뉴 높이(75px) 만큼 바닥 여백을 줌 */
+        /* [1] 전체 화면 고정: 브라우저 자체 스크롤은 막음 */
+        html, body { 
+            height: 100%; width: 100%; margin: 0; padding: 0; 
+            overflow: hidden; background: var(--bg); color: #fff; font-family: sans-serif; 
+        }
+
+        /* [2] 3단 레이아웃 설정 */
+        .wrapper { 
+            display: flex; 
+            flex-direction: column; 
+            height: 100vh; 
+        }
+
+        header#header-placeholder { height: 65px; flex-shrink: 0; border-bottom: 1px solid var(--border); z-index: 100; }
+        footer#nav-placeholder { height: 75px; flex-shrink: 0; border-top: 1px solid var(--border); z-index: 100; }
+
+        /* [3] 핵심: 메인 영역만 스크롤 가능하게 설정 */
         main { 
-            flex: 1; overflow-y: auto !important; -webkit-overflow-scrolling: touch; 
-            padding: 15px 15px 90px 15px; /* 하단 메뉴 안 가려지게 여백 확보 */
-            display: flex; flex-direction: column; gap: 15px; 
+            flex: 1; 
+            overflow-y: auto !important; /* 세로 스크롤 허용 */
+            -webkit-overflow-scrolling: touch; /* iOS 부드러운 스크롤 */
+            padding: 15px;
+            display: flex;
+            flex-direction: column;
+            gap: 20px; /* 요소 간 간격 */
         }
 
-        .chart-box { height: 350px; border-radius: 15px; overflow: hidden; border: 1px solid var(--border); flex-shrink: 0; }
+        /* [4] 요소별 높이 확보 (스크롤이 발생할 만큼 충분한 높이) */
+        .chart-box { height: 350px; min-height: 350px; border-radius: 15px; overflow: hidden; border: 1px solid var(--border); flex-shrink: 0; }
+        .ai-terminal { min-height: 250px; background: #000; border: 2px solid var(--accent); border-radius: 15px; padding: 15px; flex-shrink: 0; }
         
-        .ai-terminal { background: #000; border: 2px solid var(--accent); border-radius: 15px; padding: 15px; flex-shrink: 0; }
-        .log-screen { height: 120px; overflow-y: auto; color: #10b981; font-family: monospace; font-size: 0.85rem; margin-bottom: 10px; }
-        .ai-btn { width: 100%; height: 50px; background: var(--accent); color: #000; border: none; border-radius: 10px; font-weight: 800; cursor: pointer; }
+        /* [5] 바닥 짤림 방지용 여백 (하단 바 높이만큼 추가) */
+        .bottom-spacer { height: 80px; flex-shrink: 0; }
 
-        /* 하단 메뉴 고정 */
-        footer#nav-placeholder { 
-            position: fixed; bottom: 0; width: 100%; height: 75px; 
-            background: #0f172a; border-top: 1px solid var(--border); z-index: 1000; 
-        }
+        .log-screen { height: 130px; overflow-y: auto; color: #10b981; font-family: monospace; font-size: 0.85rem; margin-bottom: 10px; }
+        .ai-btn { width: 100%; height: 50px; background: var(--accent); border: none; border-radius: 10px; font-weight: 800; cursor: pointer; color:#000; }
     </style>
 </head>
 <body>
+
 <div class="wrapper">
     <header id="header-placeholder"></header>
 
-    <div id="engine-placeholder"></div>
+    <main id="scroll-area">
+        <div class="chart-box" id="tv_chart_main"></div>
 
-    <main>
-        <div class="chart-box" id="tv_chart"></div>
-        
         <div class="ai-terminal">
-            <div style="font-size:0.8rem; color:var(--accent); font-weight:800; margin-bottom:5px;">AI QUANT MONITORING</div>
-            <div class="log-screen" id="aiLogs"><div>[READY] 시스템 정상 가동 중...</div></div>
-            <button class="ai-btn" id="startBtn" onclick="if(window.AI_ENGINE) window.AI_ENGINE.toggle('startBtn', 'aiLogs')">
-                AI 자동매매 가동
-            </button>
+            <div style="color:var(--accent); font-weight:800; margin-bottom:10px;">AI TERMINAL ACTIVE</div>
+            <div class="log-screen" id="aiLogs"><div>[READY] 시장 데이터 수신 대기 중...</div></div>
+            <button class="ai-btn" id="startBtn" onclick="if(window.AI_ENGINE) window.AI_ENGINE.toggle('startBtn', 'aiLogs')">AI 자동매매 가동</button>
         </div>
+
+        <div style="background:var(--card); padding:20px; border-radius:15px; border:1px solid var(--border); flex-shrink:0;">
+            <h4 style="margin:0 0 10px 0;">거래 전략 정보</h4>
+            <p style="font-size:0.85rem; color:#94a3b8; line-height:1.6;">현재 RSI 과매도 구간 진입 확인 및 볼린저 밴드 하단 지지를 바탕으로 자동 매수 타점을 분석 중입니다.</p>
+        </div>
+
+        <div class="bottom-spacer"></div>
     </main>
 
     <footer id="nav-placeholder"></footer>
 </div>
+
+<div id="engine-placeholder" style="display:none;"></div>
 
 <script>
     const BASE = "https://minetia.github.io/";
     const params = new URLSearchParams(window.location.search);
     const symbol = params.get('symbol') || 'UPBIT:BTCKRW';
 
-    // 모든 컴포넌트(헤더, 하단, 엔진)를 차례대로 인클루드
-    async function loadComponents() {
+    async function loadResources() {
         try {
-            // 헤더 불러오기
-            const header = await fetch(BASE + 'header.html').then(r => r.text());
-            document.getElementById('header-placeholder').innerHTML = header;
+            // 헤더, 내비, 엔진 동시 로드
+            const [h, n, e] = await Promise.all([
+                fetch(BASE + 'header.html').then(r => r.text()),
+                fetch(BASE + 'nav.html').then(r => r.text()),
+                fetch(BASE + 'engine.html').then(r => r.text())
+            ]);
 
-            // 하단 메뉴 불러오기
-            const nav = await fetch(BASE + 'nav.html').then(r => r.text());
-            document.getElementById('nav-placeholder').innerHTML = nav;
+            document.getElementById('header-placeholder').innerHTML = h;
+            document.getElementById('nav-placeholder').innerHTML = n;
+            document.getElementById('engine-placeholder').innerHTML = e;
 
-            // 엔진 스크립트 불러오기 및 실행
-            const engine = await fetch(BASE + 'engine.html').then(r => r.text());
-            document.getElementById('engine-placeholder').innerHTML = engine;
-            
-            // 인클루드된 HTML 내부에 <script>가 있으면 수동으로 실행시켜줘야 함
-            const scripts = document.getElementById('engine-placeholder').querySelectorAll('script');
-            scripts.forEach(oldScript => {
-                const newScript = document.createElement('script');
-                newScript.text = oldScript.text;
-                document.head.appendChild(newScript).parentNode.removeChild(newScript);
+            // 엔진 스크립트 강제 주입
+            const script = document.getElementById('engine-placeholder').querySelector('script');
+            if(script) {
+                const newS = document.createElement('script');
+                newS.text = script.text;
+                document.head.appendChild(newS).parentNode.removeChild(newS);
+            }
+
+            // 차트 초기화
+            new TradingView.widget({
+                "container_id": "tv_chart_main",
+                "symbol": symbol,
+                "interval": "1", "theme": "dark", "autosize": true, "locale": "ko"
             });
-
-            console.log("모든 인클루드 완료: 헤더, 하단바, 엔진");
-        } catch (e) {
-            console.error("인클루드 로드 실패:", e);
-        }
-
-        // 트레이딩뷰 차트 실행
-        new TradingView.widget({
-            "container_id": "tv_chart",
-            "symbol": symbol,
-            "interval": "1",
-            "theme": "dark",
-            "autosize": true,
-            "locale": "ko"
-        });
+        } catch(err) { console.error("Resource Load Error"); }
     }
 
-    window.onload = loadComponents;
+    window.onload = loadResources;
 </script>
 </body>
 </html>
