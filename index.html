@@ -74,29 +74,34 @@
         let currentMarket = 'DOMESTIC';
         let isFetching = false; // 중복 호출 방지용
 
-        async function switchMarket(market) {
-            if (currentMarket === market) return;
-            currentMarket = market;
-            document.getElementById('tabKrw').classList.toggle('active', market === 'DOMESTIC');
-            document.getElementById('tabUsdt').classList.toggle('active', market === 'OVERSEAS');
-            document.getElementById('coinList').innerHTML = '<div style="text-align:center; padding:50px; color:var(--text-sub);">시장 전환 중...</div>';
-            allCoins = []; // 초기화
-            await fetchMarket();
-        }
-
         async function fetchMarket() {
             if (isFetching) return;
             isFetching = true;
             try {
                 let data = [];
                 if (currentMarket === 'DOMESTIC') {
-                    const res = await axios.get('https://api.upbit.com/v1/market/all');
-                    const krwMarkets = res.data.filter(m => m.market.startsWith('KRW-')).map(m => m.market);
-                    const tickerRes = await axios.get(`https://api.upbit.com/v1/ticker?markets=${krwMarkets.join(',')}`);
-                    data = tickerRes.data.map(t => ({
-                        s: t.market.replace('KRW-', ''), p: t.trade_price, c: (t.signed_change_rate * 100).toFixed(2), v: t.acc_trade_price_24h, cur: '₩'
-                    }));
+                    // 1. 업비트 전체 마켓 리스트 수집
+                    const res = await axios.get('https://api.upbit.com/v1/market/all?isDetails=false');
+                    // 2. 원화(KRW) 마켓만 필터링
+                    const krwMarkets = res.data.filter(m => m.market.startsWith('KRW-'));
+                    const marketIds = krwMarkets.map(m => m.market);
+                    
+                    // 3. 필터링된 모든 마켓의 현재가를 한 번의 요청으로 수집 (속도 및 차단 방지 핵심)
+                    const tickerRes = await axios.get(`https://api.upbit.com/v1/ticker?markets=${marketIds.join(',')}`);
+                    
+                    data = tickerRes.data.map(t => {
+                        const coinInfo = krwMarkets.find(m => m.market === t.market);
+                        return {
+                            s: t.market.replace('KRW-', ''), // 심볼
+                            n: coinInfo ? coinInfo.korean_name : t.market, // 한글명 보존
+                            p: t.trade_price, 
+                            c: (t.signed_change_rate * 100).toFixed(2), 
+                            v: t.acc_trade_price_24h, 
+                            cur: '₩'
+                        };
+                    });
                 } else {
+                    // 바이낸스 API (기존 로직 유지)
                     const res = await axios.get('https://api.binance.com/api/v3/ticker/24hr');
                     data = res.data.filter(t => t.symbol.endsWith('USDT')).slice(0, 50).map(t => ({
                         s: t.symbol.replace('USDT', ''), p: parseFloat(t.lastPrice), c: parseFloat(t.priceChangePercent).toFixed(2), v: parseFloat(t.quoteVolume), cur: '$'
@@ -104,9 +109,14 @@
                 }
                 allCoins = data.sort((a, b) => b.v - a.v);
                 renderList(allCoins);
-                updateTicker(allCoins);
+                if (typeof updateTicker === 'function') updateTicker(allCoins);
+                
+                // 데이터 수집 엔진(core.js) 기록 [cite: 2026-02-13]
+                if (window.NEXUS_CORE) {
+                    NEXUS_CORE.data.dataBuffer.push({ t: Date.now(), m: currentMarket, status: "UPBIT_FIXED" });
+                }
             } catch (e) {
-                console.error("데이터 오류", e);
+                console.error("업비트 API 연결 오류 발생", e);
             } finally {
                 isFetching = false;
             }
@@ -146,4 +156,5 @@
     </script>
 </body>
 </html>
+
 
